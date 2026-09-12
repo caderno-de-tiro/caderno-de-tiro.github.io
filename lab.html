@@ -1,0 +1,761 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<meta name="referrer" content="no-referrer">
+<title>Lab — Caderno de Tiro</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2032%2032%27%3E%3Crect%20width=%2732%27%20height=%2732%27%20rx=%277%27%20fill=%27%237d4517%27/%3E%3Crect%20x=%273.5%27%20y=%272.5%27%20width=%2725%27%20height=%2727%27%20rx=%274%27%20fill=%27%23fdf3dc%27%20stroke=%27%23a9721f%27%20stroke-width=%272%27/%3E%3Cpath%20d=%27M13%206.5v6L8.5%2023a2%202%200%200%200%201.8%203h11.4a2%202%200%200%200%201.8-3L19%2012.5v-6z%27%20fill=%27%23a9ddc6%27%20stroke=%27%23a9721f%27%20stroke-width=%271.6%27%20stroke-linejoin=%27round%27/%3E%3Cpath%20d=%27M11.4%206.5h9.2%27%20stroke=%27%23a9721f%27%20stroke-width=%271.8%27%20stroke-linecap=%27round%27/%3E%3Ccircle%20cx=%2714.5%27%20cy=%2721%27%20r=%271.4%27%20fill=%27%23e0a52c%27/%3E%3Ccircle%20cx=%2718.5%27%20cy=%2723.5%27%20r=%271%27%20fill=%27%23e0a52c%27/%3E%3C/svg%3E">
+<style>
+  :root{
+    --wood1:#d79b4e; --wood2:#b06f2c; --wood3:#7d4517; --wood4:#5a3010;
+    --gold1:#ffe9a8; --gold2:#e8b954; --gold3:#a9721f;
+    --parch1:#fdf3dc; --parch2:#f3e2bb; --parch3:#e6cf9d;
+    --mint:#a9ddc6; --mint2:#c9ebdc;
+    --ink:#4a2d10; --ink2:#6f4d24; --ink3:#8a6a3d;
+    --red1:#e2663f; --red2:#b53b22;
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none !important}
+  html,body{margin:0;min-height:100%}
+  body{
+    background:
+      radial-gradient(1200px 600px at 50% -5%, #6fb0d8 0%, rgba(111,176,216,0) 55%),
+      linear-gradient(180deg,#3f7d4e 0%,#2f5f3d 35%,#27503a 100%);
+    background-attachment:fixed;
+    color:var(--ink);
+    font:14px/1.45 "Trebuchet MS","Segoe UI",Verdana,Geneva,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1220px;margin:0 auto;padding:14px 14px 70px}
+
+  /* ---------- moldura de madeira ---------- */
+  .frame{
+    background:linear-gradient(180deg,var(--wood1),var(--wood2) 45%,var(--wood3));
+    border:2px solid var(--wood4);
+    border-radius:10px;
+    box-shadow:0 3px 0 #00000040, 0 10px 22px #00000038, inset 0 1px 0 #ffdca8a6;
+    padding:6px;
+  }
+  .plate{
+    background:linear-gradient(180deg,var(--parch1),var(--parch2));
+    border:2px solid var(--gold3);
+    border-radius:7px;
+    box-shadow:inset 0 0 0 1px #fffaf0, inset 0 2px 6px #b5883f33;
+  }
+  .pad{padding:11px 12px}
+
+  /* ---------- botões ---------- */
+  button,.btn{
+    font:inherit;font-weight:700;color:#fff5dd;
+    background:linear-gradient(180deg,#e9a94a,#c1741f 55%,#9c561a);
+    border:1px solid #6d3a10;border-radius:7px;padding:7px 12px;cursor:pointer;
+    text-shadow:0 1px 0 #5b3210;
+    box-shadow:inset 0 1px 0 #ffe1a8a6, 0 2px 0 #6d3a10, 0 3px 6px #00000030;
+    transition:filter .12s, transform .05s;
+  }
+  button:hover,.btn:hover{filter:brightness(1.09)}
+  button:active,.btn:active{transform:translateY(2px);box-shadow:inset 0 1px 0 #ffe1a880, 0 0 0 #6d3a10}
+  button.primary{background:linear-gradient(180deg,#ffd062,#f09218 50%,#d86a10);border-color:#8a3f08}
+  button.ghost{
+    background:linear-gradient(180deg,#fdf1d6,#ead7ac);color:var(--ink);
+    border-color:var(--gold3);text-shadow:0 1px 0 #fffaf0;
+    box-shadow:inset 0 1px 0 #fffdf4, 0 2px 0 #b98c3e, 0 3px 6px #00000022;
+  }
+  button.tiny{padding:3px 8px;font-size:11px;border-radius:6px;box-shadow:inset 0 1px 0 #ffe1a880, 0 2px 0 #6d3a10}
+  button.danger{background:linear-gradient(180deg,#ef7d55,#cc4a26 55%,#a8331b);border-color:#7d2413}
+  button.danger.tiny{background:linear-gradient(180deg,#ef7d55,#b8381f);border-color:#7d2413}
+
+  input,textarea,select{
+    font:inherit;color:var(--ink);
+    background:linear-gradient(180deg,#fffdf4,#f7ecd2);
+    border:1px solid var(--gold3);border-radius:6px;padding:7px 9px;outline:none;
+    box-shadow:inset 0 2px 4px #b5883f2e;
+  }
+  input:focus,textarea:focus,select:focus{border-color:#e08a1f;box-shadow:inset 0 2px 4px #b5883f2e, 0 0 0 3px #ffc25c66}
+  ::placeholder{color:#b39a6e}
+
+  /* ---------- menu ---------- */
+  .nav{display:flex;gap:6px;margin:0 0 12px;align-items:flex-end}
+  .nav a{
+    text-decoration:none;display:block;padding:8px 18px;font-weight:700;font-size:14px;
+    color:#f3e0b6;background:linear-gradient(180deg,#b57b34,#8d5218);
+    border:2px solid var(--wood4);border-bottom:0;border-radius:9px 9px 0 0;
+    text-shadow:0 1px 0 #5b3210;box-shadow:inset 0 1px 0 #ffdca880;position:relative;top:2px
+  }
+  .nav a:hover{filter:brightness(1.1)}
+  .nav a.home{
+    background:linear-gradient(180deg,#8d6b3f,#66431a);color:#e8d3ac;
+    padding-left:12px;padding-right:12px;margin-right:4px
+  }
+  .nav a.on{
+    color:var(--ink);background:linear-gradient(180deg,var(--parch1),var(--parch2));
+    text-shadow:0 1px 0 #fffaf0;top:0;padding-bottom:10px;
+    box-shadow:inset 0 1px 0 #fffdf4,0 -2px 6px #00000022
+  }
+
+  /* ---------- barra de cadastro ---------- */
+  .quick{position:sticky;top:8px;z-index:30;margin:0 0 16px}
+  .quick .plate{padding:11px 12px}
+  .qrow{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
+  .fld{display:flex;flex-direction:column;gap:3px}
+  .fld label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--ink2)}
+  .fld.bl input{width:210px} .fld.lbl input{width:190px}
+  .num{width:72px;text-align:center;font-weight:700;font-size:16px}
+  .slash{align-self:center;color:var(--ink3);font-weight:700;font-size:18px;padding:0 2px 7px}
+  .qhint{font-size:11px;color:var(--ink3);margin-top:8px;border-top:1px dashed #c8ab74;padding-top:7px}
+  .qhint kbd{
+    background:linear-gradient(180deg,#fffdf4,#ecdcb6);border:1px solid var(--gold3);border-bottom-width:2px;
+    border-radius:4px;padding:1px 5px;font:700 11px/1.4 "Trebuchet MS",sans-serif;color:var(--ink)
+  }
+
+  /* ---------- blocos do laboratório ---------- */
+  #board{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px;align-items:start}
+  .bloco .plate{padding:9px 10px 10px}
+  .bhead{display:flex;align-items:center;gap:8px;row-gap:6px;flex-wrap:wrap;margin-bottom:8px}
+  .bico{
+    flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;
+    background:radial-gradient(circle at 35% 28%,#fffaee,#f0dcae 70%,#e0c890);
+    border:2px solid var(--gold3);
+    box-shadow:inset 0 1px 0 #fffdf4, 0 2px 3px #00000040, 0 0 0 1px #00000030;
+  }
+  .bico svg{width:19px;height:19px;display:block}
+  .btit{flex:1 1 auto;min-width:min(100%,150px)}
+  .bnome{
+    display:block;font-size:15px;font-weight:700;color:var(--ink);padding:2px 5px;border-radius:4px;
+    outline:none;text-shadow:0 1px 0 #fffaf0;overflow-wrap:anywhere;cursor:text;
+    border-bottom:2px dotted transparent
+  }
+  .bnome:hover{border-bottom-color:#d9b96a}
+  .bnome:focus{background:#fffdf4;box-shadow:0 0 0 2px #ffc25c;border-bottom-color:transparent}
+  .bsub{
+    display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;
+    color:var(--ink3);padding:1px 5px;border-radius:4px;outline:none;cursor:text;overflow-wrap:anywhere
+  }
+  .bsub:empty::before{content:"subtítulo";color:#c3ab7e}
+  .bsub:focus{background:#fffdf4;box-shadow:0 0 0 2px #ffc25c;color:var(--ink2)}
+  .bcount{font-size:10px;font-weight:700;color:var(--ink3);white-space:nowrap;flex:none}
+  .bhead .sp{
+    margin-left:auto;flex:0 0 auto;display:flex;gap:3px;align-items:center;
+    padding:3px 5px;border-radius:8px;
+    background:linear-gradient(180deg,#e7d1a2,#d9bd88);
+    border:1px solid #b4903f;
+    box-shadow:inset 0 1px 0 #fff6e0, inset 0 -2px 4px #b5883f4d;
+  }
+  .bhead .sp button{
+    height:19px;padding:0 8px;font-size:10.5px;border-radius:5px;
+    box-shadow:inset 0 1px 0 #ffe1a880, 0 2px 0 #6d3a10;
+  }
+  .bhead .sp button.ico{width:20px;padding:0;font-size:9px;line-height:17px}
+  .bhead .sp .sep{
+    width:2px;height:15px;margin:0 1px;border-radius:1px;
+    background:linear-gradient(180deg,#0000,#b4903f 45%,#0000);
+    box-shadow:1px 0 0 #fff6e0;
+  }
+
+  /* ---------- tabela estilo DDTank ---------- */
+  table.tbl{width:100%;border-collapse:collapse;border:1px solid #9d7a3f;background:#fffdf4}
+  table.tbl th{
+    background:linear-gradient(180deg,#f0dcae,#e0c890);
+    color:var(--ink);font-size:11px;font-weight:700;padding:3px 4px;
+    border:1px solid #9d7a3f;text-shadow:0 1px 0 #fff6e0;white-space:nowrap
+  }
+  table.tbl td{border:1px solid #9d7a3f;padding:0;height:24px}
+  table.tbl tbody tr:nth-child(even){background:var(--mint)}
+  table.tbl tbody tr:nth-child(odd){background:#fffdf4}
+  table.tbl tbody tr:hover{background:#ffe9b5}
+  .c-lbl{width:44%}
+  .c-lbl div{
+    padding:3px 6px;font-size:12px;color:var(--ink2);outline:none;min-height:18px;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap
+  }
+  .c-lbl div:empty::before{content:"—";color:#b39a6e}
+  .c-lbl div:focus{background:#fffdf4;box-shadow:inset 0 0 0 2px #ffc25c}
+  .c-a,.c-f{width:52px}
+  table.tbl input{
+    width:100%;height:22px;background:transparent;border:0;box-shadow:none;border-radius:0;
+    text-align:center;font-weight:700;font-size:14px;color:var(--ink);padding:0
+  }
+  table.tbl input:focus{background:#fffdf4;box-shadow:inset 0 0 0 2px #ffc25c}
+  .c-act{width:76px;white-space:nowrap;text-align:center}
+  .c-act .acts{display:flex;gap:2px;justify-content:center;opacity:.3;transition:.12s;
+    background:#e7d1a26b;border-radius:5px;padding:2px 3px}
+  table.tbl tbody tr:hover .acts,table.tbl tbody tr:focus-within .acts{opacity:1}
+  .c-act button{
+    padding:0 3px;min-width:18px;height:18px;line-height:16px;font-size:10px;border-radius:4px;
+    box-shadow:inset 0 1px 0 #ffe1a880,0 1px 0 #6d3a10
+  }
+
+  .addrow{
+    margin-top:5px;text-align:center;font-size:11px;font-weight:700;color:var(--ink2);
+    background:linear-gradient(180deg,#f6e7c4,#ebd8ad);border:1px dashed #a9822f;border-radius:5px;
+    padding:3px;cursor:pointer;text-shadow:0 1px 0 #fffaf0
+  }
+  .addrow:hover{background:linear-gradient(180deg,#ffe9b5,#f6d894);color:#8a3f08}
+
+  .empty{text-align:center;color:var(--ink2);padding:46px 20px;font-size:14px}
+  .foot{margin-top:16px;display:flex;gap:7px;flex-wrap:wrap;justify-content:center}
+
+  /* ---------- painel de backup do banco local ---------- */
+  .backup{margin-top:14px}
+  .backup .plate{padding:11px 12px}
+  .bkhead{
+    font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;
+    color:var(--ink2);margin-bottom:5px
+  }
+  .backup a{color:#9c561a;font-weight:700}
+  .backup a:hover{color:#d86a10}
+  .backup p{margin:0 0 9px;font-size:12px;color:var(--ink3);line-height:1.55}
+  .bkrow{display:flex;gap:7px;flex-wrap:wrap}
+  .bkinfo{margin-top:9px;border-top:1px dashed #c8ab74;padding-top:7px;font-size:11.5px;color:var(--ink3)}
+  .bkinfo b{color:var(--ink)}
+  .mfilerow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+  .mfilerow .nome{font-size:12px;color:var(--ink3);font-weight:700}
+
+  /* ---------- modal / diálogo ---------- */
+  .mask{position:fixed;inset:0;background:#1a2a1ccc;display:none;place-items:center;z-index:80;padding:18px}
+  .mask.on{display:grid}
+  .modal{max-width:660px;width:100%;max-height:86vh;display:flex;flex-direction:column}
+  .modal.sm{max-width:430px}
+  .modal .plate{display:flex;flex-direction:column;overflow:hidden;max-height:calc(86vh - 12px)}
+  .modal h3{
+    margin:0;padding:9px 12px;font-size:14px;color:#fff4d8;text-shadow:0 1px 0 #5b3210;
+    background:linear-gradient(180deg,#c98a3a,#9c5c1d);border-bottom:2px solid var(--gold3);
+    border-radius:5px 5px 0 0
+  }
+  .mbody{padding:12px;overflow:auto}
+  .mbody textarea{width:100%;min-height:200px;font:12.5px/1.6 ui-monospace,Menlo,monospace;resize:vertical}
+  .mfoot{padding:10px 12px;border-top:1px dashed #c8ab74;display:flex;gap:8px;justify-content:flex-end}
+  .dlg .mbody{padding:13px 14px 14px}
+  .dlg .flbl{
+    display:block;font-size:10px;font-weight:700;text-transform:uppercase;
+    letter-spacing:.07em;color:var(--ink2);margin-bottom:4px
+  }
+  .dinrow{display:flex;gap:8px;align-items:center}
+  .dinrow input{flex:1;min-width:0;font-size:15px;font-weight:700}
+  .dico{
+    flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
+    background:radial-gradient(circle at 35% 28%,#fffaee,#f0dcae 70%,#e0c890);
+    border:2px solid var(--gold3);
+    box-shadow:inset 0 1px 0 #fffdf4, 0 2px 3px #00000030;
+  }
+  .dico svg{width:22px;height:22px;display:block}
+  .derr{
+    margin:9px 0 0;font-size:12px;font-weight:700;color:var(--red2);
+    background:#e2663f1f;border:1px solid #e2663f66;border-radius:6px;padding:6px 9px
+  }
+  .dlg .aviso{
+    margin:0;font-size:12.5px;color:var(--ink2);line-height:1.55;
+    border-left:3px solid var(--red1);background:#e2663f14;border-radius:0 6px 6px 0;padding:8px 11px
+  }
+  .dlg .aviso b{color:var(--red2)}
+  @keyframes piscar{0%,100%{box-shadow:inset 0 0 0 1px #fffaf0, inset 0 2px 6px #b5883f33}
+                    35%{box-shadow:0 0 0 3px #ffc25c, inset 0 0 0 1px #fffaf0}}
+  .novo{animation:piscar 1.1s ease-in-out 2}
+
+  /* ---------- toast ---------- */
+  #toast{
+    position:fixed;left:50%;bottom:20px;transform:translate(-50%,80px);z-index:99;
+    background:linear-gradient(180deg,var(--parch1),var(--parch2));color:var(--ink);font-weight:700;
+    border:2px solid var(--gold3);border-radius:8px;padding:9px 16px;font-size:13px;
+    box-shadow:0 8px 24px #00000055, inset 0 0 0 1px #fffaf0;opacity:0;transition:.2s;pointer-events:none
+  }
+  #toast.on{opacity:1;transform:translate(-50%,0)}
+
+  /* ---------- telas estreitas ---------- */
+  @media(hover:none){ .c-act .acts{opacity:1} }
+
+  @media(max-width:620px){
+    .fld.bl input,.fld.lbl input{width:100%}
+    .fld{flex:1 1 100%}
+    .fld.a,.fld.f{flex:1 1 30%}
+    .slash{display:none}
+    #board{grid-template-columns:1fr}
+    .quick{position:static}
+    .qrow>button{flex:1 1 auto}
+    .qhint{display:none}
+    .mask{padding:10px}
+    .modal{max-height:92vh}
+    .modal .plate{max-height:calc(92vh - 12px)}
+    .mbody{padding:10px}
+    .mfoot{padding:9px 10px}
+    .mfoot button{flex:1 1 auto}
+    .foot button{flex:1 1 auto}
+    .empty{padding:30px 14px}
+  }
+
+  @media(max-width:420px){
+    .wrap{padding:10px 8px 56px}
+    .nav a{flex:1;text-align:center;padding:8px 8px;font-size:13px}
+    .c-lbl{width:38%}
+    .c-a,.c-f{width:46px}
+    table.tbl input{font-size:13px}
+    .c-act{width:70px}
+    .bkrow button{flex:1 1 auto}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <nav class="nav">
+    <a href="index.html" class="home">Menu</a>
+    <a href="calculadora.html">Calculadora de tiro</a>
+    <a href="referencias.html">Referências</a>
+    <a href="lab.html" class="on">Lab</a>
+  </nav>
+
+  <!-- cadastro rápido -->
+  <form class="quick" id="qform" autocomplete="off">
+   <div class="frame"><div class="plate">
+    <div class="qrow">
+      <div class="fld bl">
+        <label for="qb">Bloco</label>
+        <input id="qb" list="dlBloco" placeholder="Laboratório último livro" required>
+        <datalist id="dlBloco"></datalist>
+      </div>
+      <div class="fld lbl">
+        <label for="ql">Nome do tiro</label>
+        <input id="ql" list="dlLbl" placeholder="Meio alto">
+        <datalist id="dlLbl"></datalist>
+      </div>
+      <div class="fld a">
+        <label for="qa">Ângulo</label>
+        <input id="qa" class="num" inputmode="numeric" placeholder="30" required>
+      </div>
+      <div class="slash">/</div>
+      <div class="fld f">
+        <label for="qf">Força</label>
+        <input id="qf" class="num" inputmode="numeric" placeholder="85" required>
+      </div>
+      <button class="primary" type="submit">+ Adicionar</button>
+      <button type="button" id="bNovo" class="ghost" title="Criar um bloco vazio">+ bloco</button>
+    </div>
+    <div class="qhint">
+      Digite <kbd>30/85</kbd> no campo Ângulo para preencher os dois de uma vez ·
+      <kbd>Enter</kbd> salva e mantém o bloco · clique no título, no subtítulo ou em qualquer
+      número para editar · tudo é salvo no navegador
+    </div>
+   </div></div>
+  </form>
+
+  <div id="board"></div>
+
+  <div class="foot">
+    <button class="tiny ghost" id="bCopiar">copiar como texto</button>
+  </div>
+
+  <div class="backup frame"><div class="plate">
+    <div class="bkhead">Banco de dados local</div>
+    <p>O Lab fica salvo <b>só neste navegador</b>. Baixe o arquivo <b>.json</b> para guardar,
+       levar para outro aparelho ou trocar com alguém — e carregue um arquivo para trazer
+       os dados de volta. Aqui entra tanto o .json desta página quanto o arquivo único do
+       <a href="index.html">menu</a>, que traz as três páginas juntas (deste eu pego só a
+       parte do Lab).</p>
+    <div class="bkrow">
+      <button class="ghost" id="bExpJson">⬇ Baixar banco (.json)</button>
+      <button class="ghost" id="bImpJson">⬆ Carregar banco (.json)</button>
+      <button class="danger" id="bWipe" style="margin-left:auto">apagar tudo</button>
+    </div>
+    <div class="bkinfo" id="bkInfo"></div>
+    <input type="file" id="fileJson" accept=".json,application/json" hidden>
+  </div></div>
+</div>
+
+<!-- modal de arquivo / texto -->
+<div class="mask" id="mask">
+  <div class="modal"><div class="frame"><div class="plate">
+    <h3 id="mTitle">Carregar banco</h3>
+    <div class="mbody">
+      <p id="mDesc" style="margin:0 0 10px;color:var(--ink2);font-size:12.5px"></p>
+      <div class="mfilerow" id="mFileRow" hidden>
+        <button type="button" class="ghost" id="mPick">Escolher arquivo .json…</button>
+        <span class="nome" id="mFileName">nenhum arquivo escolhido</span>
+      </div>
+      <textarea id="mText" spellcheck="false"></textarea>
+    </div>
+    <div class="mfoot">
+      <button type="button" class="ghost" id="mCancel">Fechar</button>
+      <button type="button" class="primary" id="mOk">Aplicar</button>
+    </div>
+  </div></div></div>
+</div>
+
+<!-- diálogo (no lugar do prompt/confirm do navegador) -->
+<div class="mask" id="dmask">
+  <div class="modal sm dlg"><div class="frame"><div class="plate">
+    <h3 id="dTitle">Novo bloco</h3>
+    <div class="mbody">
+      <p class="desc" id="dDesc" style="margin:0 0 12px;color:var(--ink2);font-size:12.5px"></p>
+      <div id="dField">
+        <label class="flbl" id="dLabel" for="dInput">Nome</label>
+        <div class="dinrow">
+          <span class="dico" id="dIco"></span>
+          <input id="dInput" autocomplete="off">
+        </div>
+      </div>
+      <p class="derr" id="dErr" hidden></p>
+    </div>
+    <div class="mfoot">
+      <button type="button" class="ghost" id="dCancel">Cancelar</button>
+      <button type="button" class="primary" id="dOk">Criar</button>
+    </div>
+  </div></div></div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+(function(){
+"use strict";
+/* ---------------------------------------------------------------------------
+   LAB — bloco de anotações de ângulos decorados.
+   Banco próprio (chave ddtank_lab_v1), separado do das Referências: aqui o que
+   importa é a combinação ângulo/força que você decorou, sem instância/stage.
+   --------------------------------------------------------------------------- */
+const KEY='ddtank_lab_v1';
+const $=s=>document.querySelector(s);
+const uid=()=>Math.random().toString(36).slice(2,9);
+/* Os ids de um arquivo importado vão direto para dentro de atributos HTML
+   (data-bloco). Um id com aspas quebraria o atributo e deixaria
+   quem mandou o .json rodar script nesta página. Só aceito o formato que o
+   uid() gera; qualquer outra coisa ganha um id novo. */
+const idOk=v=>typeof v==='string'&&/^[A-Za-z0-9_-]{1,40}$/.test(v)?v:uid();
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const norm=s=>String(s||'').trim().toLowerCase();
+
+const ICO_LAB='<svg viewBox="0 0 24 24" aria-hidden="true">'
+ +'<path d="M10 2.5v6.2L4.8 19a2.2 2.2 0 0 0 2 3.2h10.4a2.2 2.2 0 0 0 2-3.2L14 8.7V2.5z" fill="#a9ddc6" stroke="#a9721f" stroke-width="1.5" stroke-linejoin="round"/>'
+ +'<path d="M8.3 2.5h7.4" stroke="#a9721f" stroke-width="1.8" stroke-linecap="round"/>'
+ +'<path d="M7.4 15.5h9.2l2.6 4.6a1.4 1.4 0 0 1-1.2 2.1H6a1.4 1.4 0 0 1-1.2-2.1z" fill="#2f7d4e" opacity=".55"/>'
+ +'<circle cx="10" cy="18.6" r="1.2" fill="#ffd062"/><circle cx="14.2" cy="20.2" r=".9" fill="#ffd062"/>'
+ +'</svg>';
+
+/* ---------------- estado ---------------- */
+/* Lab vazio: o primeiro bloco nasce quando você cadastra o primeiro tiro.
+   Para trazer um banco pronto, use "Carregar banco (.json)". */
+function seed(){ return {v:1,blocos:[]}; }
+let db;
+try{ const raw=JSON.parse(localStorage.getItem(KEY)); db=(raw&&Array.isArray(raw.blocos))?raw:seed(); }
+catch(e){ db=seed(); }
+
+let saveT;
+function save(){ clearTimeout(saveT); saveT=setTimeout(()=>{
+  try{ localStorage.setItem(KEY,JSON.stringify(db)); }catch(e){ toast('não foi possível salvar'); }
+  infoBanco();
+},120); }
+
+function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('on'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('on'),1800); }
+
+/* ---------------------------------------------------------------------------
+   DIÁLOGOS — no lugar do prompt()/confirm() do navegador, que aparecem fora da
+   cara do jogo e travam a página.
+     pedirNome({...}) -> Promise<string|null>
+     pedirOk({...})   -> Promise<boolean>
+   --------------------------------------------------------------------------- */
+let dlgState=null;
+function abrirDlg(o){
+  dlgState=o;
+  $('#dTitle').textContent=o.titulo||'';
+  $('#dDesc').innerHTML=o.desc||'';
+  $('#dDesc').hidden=!o.desc;
+  $('#dErr').hidden=true;
+  const temCampo=o.modo==='nome';
+  $('#dField').hidden=!temCampo;
+  $('#dIco').innerHTML=ICO_LAB;
+  if(temCampo){
+    $('#dLabel').textContent=o.rotulo||'Nome';
+    $('#dInput').value=o.valor||'';
+    $('#dInput').placeholder=o.placeholder||'';
+  }
+  $('#dOk').textContent=o.ok||'Criar';
+  $('#dOk').className=o.perigo?'danger':'primary';
+  $('#dmask').classList.add('on');
+  setTimeout(()=>{ temCampo? ($('#dInput').focus(),$('#dInput').select()) : $('#dOk').focus(); },30);
+  return new Promise(res=>{ dlgState.res=res; });
+}
+function fecharDlg(v){
+  if(!dlgState) return;
+  const res=dlgState.res; dlgState=null;
+  $('#dmask').classList.remove('on');
+  res(v);
+}
+function confirmarDlg(){
+  if(!dlgState) return;
+  if(dlgState.modo!=='nome') return fecharDlg(true);
+  const v=$('#dInput').value.trim();
+  if(!v){ $('#dErr').textContent='Escreva um nome.'; $('#dErr').hidden=false; $('#dInput').focus(); return; }
+  if(dlgState.jaExiste && dlgState.jaExiste(v)){
+    $('#dErr').textContent='Já existe um bloco com esse nome.'; $('#dErr').hidden=false; $('#dInput').focus(); return;
+  }
+  fecharDlg(v);
+}
+const pedirNome=o=>abrirDlg(Object.assign({modo:'nome'},o));
+const pedirOk=o=>abrirDlg(Object.assign({modo:'ok',ok:'Apagar',perigo:true},o));
+$('#dOk').onclick=confirmarDlg;
+$('#dCancel').onclick=()=>fecharDlg(dlgState&&dlgState.modo==='nome'?null:false);
+$('#dmask').addEventListener('mousedown',e=>{ if(e.target===$('#dmask')) $('#dCancel').click(); });
+$('#dInput').addEventListener('keydown',e=>{ if(e.key==='Enter'){e.preventDefault();confirmarDlg();} });
+
+/* ---------------- dados ---------------- */
+function getBloco(nome,criar){
+  let b=db.blocos.find(x=>norm(x.nome)===norm(nome));
+  if(!b && criar){ b={id:uid(),nome:String(nome).trim(),sub:'Ângulos decorados',linhas:[]}; db.blocos.push(b); }
+  return b;
+}
+function clamp(n){ n=parseInt(n,10); if(isNaN(n))n=0; return Math.max(0,Math.min(999,n)); }
+function acha(bi,li){ const b=db.blocos[bi]; return {b,l:b&&b.linhas[li]}; }
+function mover(arr,i,dir){
+  const j=i+dir; if(j<0||j>=arr.length) return false;
+  const [x]=arr.splice(i,1); arr.splice(j,0,x); return true;
+}
+
+/* ---------------- render ---------------- */
+function render(){
+  const bo=$('#board');
+  if(!db.blocos.length){
+    bo.innerHTML='<div class="frame" style="grid-column:1/-1"><div class="plate"><div class="empty">'
+      +'Nenhum bloco ainda. Escreva um nome em <b>Bloco</b> lá em cima e adicione o primeiro ângulo.'
+      +'</div></div></div>';
+  }else{
+    bo.innerHTML=db.blocos.map((b,bi)=>{
+      const linhas=b.linhas.map((l,li)=>`
+        <tr>
+          <td class="c-lbl"><div contenteditable data-e="label" data-b="${bi}" data-l="${li}">${esc(l.label)}</div></td>
+          <td class="c-a"><input inputmode="numeric" data-e="a" data-b="${bi}" data-l="${li}" value="${l.a}"></td>
+          <td class="c-f"><input inputmode="numeric" data-e="f" data-b="${bi}" data-l="${li}" value="${l.f}"></td>
+          <td class="c-act"><div class="acts">
+            <button class="ghost" data-ac="up"  data-b="${bi}" data-l="${li}" title="Subir">▲</button>
+            <button class="ghost" data-ac="dn"  data-b="${bi}" data-l="${li}" title="Descer">▼</button>
+            <button class="danger" data-ac="del" data-b="${bi}" data-l="${li}" title="Apagar">✕</button>
+          </div></td>
+        </tr>`).join('');
+      return `<div class="bloco frame" data-bloco="${esc(b.id)}"><div class="plate">
+        <div class="bhead">
+          <span class="bico">${ICO_LAB}</span>
+          <span class="btit">
+            <span class="bnome" contenteditable data-e="bnome" data-b="${bi}">${esc(b.nome)}</span>
+            <span class="bsub"  contenteditable data-e="bsub"  data-b="${bi}">${esc(b.sub)}</span>
+          </span>
+          <span class="bcount">${b.linhas.length} tiro${b.linhas.length===1?'':'s'}</span>
+          <span class="sp">
+            <button class="ghost ico" data-ac="bup" data-b="${bi}" title="Subir bloco">▲</button>
+            <button class="ghost ico" data-ac="bdn" data-b="${bi}" title="Descer bloco">▼</button>
+            <span class="sep"></span>
+            <button class="ghost" data-ac="bcopy" data-b="${bi}" title="Copiar este bloco como texto">copiar</button>
+            <button class="danger ico" data-ac="bdel" data-b="${bi}" title="Apagar bloco">✕</button>
+          </span>
+        </div>
+        <table class="tbl">
+          <thead><tr><th>Tiro</th><th>Âng</th><th>For</th><th></th></tr></thead>
+          <tbody>${linhas}</tbody>
+        </table>
+        <div class="addrow" data-ac="add" data-b="${bi}">+ linha</div>
+      </div></div>`;
+    }).join('');
+  }
+  preencherListas();
+  infoBanco();
+}
+
+function preencherListas(){
+  $('#dlBloco').innerHTML=db.blocos.map(b=>`<option value="${esc(b.nome)}">`).join('');
+  const labels=[...new Set(db.blocos.flatMap(b=>b.linhas.map(l=>l.label)).filter(Boolean))];
+  $('#dlLbl').innerHTML=labels.map(l=>`<option value="${esc(l)}">`).join('');
+}
+
+function infoBanco(){
+  const tiros=db.blocos.reduce((n,b)=>n+b.linhas.length,0);
+  let tam='—';
+  try{ tam=(new Blob([localStorage.getItem(KEY)||'']).size/1024).toFixed(1)+' KB'; }catch(e){}
+  $('#bkInfo').innerHTML=`<b>${db.blocos.length}</b> bloco(s) · <b>${tiros}</b> tiro(s) · ${tam} guardados neste navegador`;
+}
+
+function destacar(sel){
+  const el=document.querySelector(sel); if(!el) return;
+  const p=el.querySelector('.plate')||el;
+  p.classList.add('novo'); setTimeout(()=>p.classList.remove('novo'),2400);
+  el.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+/* ---------------- cadastro rápido ---------------- */
+$('#qa').addEventListener('input',e=>{
+  // "30/85" no campo do ângulo preenche os dois de uma vez
+  const m=e.target.value.match(/^(\d{1,3})\s*[\/\-x ]\s*(\d{1,3})$/);
+  if(m){ e.target.value=m[1]; $('#qf').value=m[2]; $('#qf').focus(); }
+});
+$('#qform').addEventListener('submit',e=>{
+  e.preventDefault();
+  const nome=$('#qb').value.trim();
+  if(!nome){ $('#qb').focus(); return; }
+  const b=getBloco(nome,true);
+  b.linhas.push({id:uid(),label:$('#ql').value.trim(),a:clamp($('#qa').value),f:clamp($('#qf').value)});
+  save(); render();
+  destacar(`[data-bloco="${b.id}"]`);
+  $('#ql').value=''; $('#qa').value=''; $('#qf').value='';
+  $('#ql').focus();
+  toast('salvo');
+});
+$('#bNovo').onclick=async()=>{
+  const nome=await pedirNome({
+    titulo:'Novo bloco', rotulo:'Nome do bloco', placeholder:'Laboratório último livro',
+    desc:'Um bloco junta os ângulos que você decorou para o mesmo lugar.',
+    jaExiste:v=>!!db.blocos.find(b=>norm(b.nome)===norm(v))
+  });
+  if(!nome) return;
+  const b=getBloco(nome,true); save(); render(); destacar(`[data-bloco="${b.id}"]`);
+};
+
+/* ---------------- edição no lugar ---------------- */
+$('#board').addEventListener('input',e=>{
+  const t=e.target, campo=t.dataset.e; if(!campo) return;
+  const bi=+t.dataset.b, b=db.blocos[bi]; if(!b) return;
+  if(campo==='bnome'){ b.nome=t.textContent.trim(); save(); preencherListas(); return; }
+  if(campo==='bsub'){ b.sub=t.textContent.trim(); save(); return; }
+  const l=b.linhas[+t.dataset.l]; if(!l) return;
+  if(campo==='label'){ l.label=t.textContent.trim(); save(); preencherListas(); }
+});
+$('#board').addEventListener('change',e=>{
+  const t=e.target, campo=t.dataset.e;
+  if(campo!=='a'&&campo!=='f') return;
+  const b=db.blocos[+t.dataset.b]; if(!b) return;
+  const l=b.linhas[+t.dataset.l]; if(!l) return;
+  l[campo]=clamp(t.value); t.value=l[campo]; save();
+});
+// colar sempre como texto puro nos campos editáveis: colar HTML de outra
+// página jogaria as tags dela vivas dentro desta (só o texto é que é salvo)
+$('#board').addEventListener('paste',e=>{
+  if(!e.target.isContentEditable)return;
+  e.preventDefault();
+  const t=(e.clipboardData||window.clipboardData).getData('text/plain').replace(/\s+/g,' ').trim();
+  document.execCommand('insertText',false,t);
+});
+// Enter fecha a edição do texto em vez de criar uma segunda linha na célula
+$('#board').addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&e.target.isContentEditable){ e.preventDefault(); e.target.blur(); }
+  if(e.key==='Enter'&&e.target.tagName==='INPUT'){ e.preventDefault(); e.target.blur(); }
+});
+
+/* ---------------- botões das linhas e dos blocos ---------------- */
+$('#board').addEventListener('click',async e=>{
+  const btn=e.target.closest('[data-ac]'); if(!btn) return;
+  const ac=btn.dataset.ac, bi=+btn.dataset.b, li=+btn.dataset.l, b=db.blocos[bi];
+  if(!b) return;
+
+  if(ac==='add'){ b.linhas.push({id:uid(),label:'',a:0,f:0}); save(); render();
+    const inps=document.querySelectorAll(`[data-e="label"][data-b="${bi}"]`);
+    const ultimo=inps[inps.length-1]; if(ultimo) ultimo.focus();
+    return; }
+  if(ac==='up'||ac==='dn'){ if(mover(b.linhas,li,ac==='up'?-1:1)){ save(); render(); } return; }
+  if(ac==='del'){
+    const l=b.linhas[li];
+    const ok=await pedirOk({titulo:'Apagar tiro',
+      desc:`<p class="aviso">Apaga <b>${esc(l.label||'sem nome')} — ${l.a}/${l.f}</b> do bloco <b>${esc(b.nome)}</b>.</p>`});
+    if(ok){ b.linhas.splice(li,1); save(); render(); toast('apagado'); }
+    return;
+  }
+  if(ac==='bup'||ac==='bdn'){ if(mover(db.blocos,bi,ac==='bup'?-1:1)){ save(); render(); } return; }
+  if(ac==='bcopy'){ copiar(textoDoBloco(b)); return; }
+  if(ac==='bdel'){
+    const ok=await pedirOk({titulo:'Apagar bloco',
+      desc:`<p class="aviso">Apaga o bloco <b>${esc(b.nome)}</b> e os <b>${b.linhas.length} tiro(s)</b> dentro dele, sem desfazer.</p>`});
+    if(ok){ db.blocos.splice(bi,1); save(); render(); toast('bloco apagado'); }
+  }
+});
+
+/* ---------------- texto ---------------- */
+function textoDoBloco(b){
+  const linhas=b.linhas.map(l=>`${l.label||'—'}: ${l.a} / ${l.f}`).join('\n');
+  return [b.nome, b.sub, '', linhas].filter((s,i)=>i!==1||s).join('\n');
+}
+const comoTexto=()=>db.blocos.map(textoDoBloco).join('\n\n');
+function copiar(txt){
+  (navigator.clipboard?navigator.clipboard.writeText(txt):Promise.reject())
+    .then(()=>toast('copiado'))
+    .catch(()=>abrirModal('texto',txt));
+}
+$('#bCopiar').onclick=()=>copiar(comoTexto());
+
+/* ---------------- modal (texto / carregar json) ---------------- */
+let modo='texto';
+function abrirModal(m,txt){
+  modo=m;
+  const ehArquivo=(m==='json');
+  $('#mTitle').textContent=ehArquivo?'Carregar banco (.json)':'Copiar como texto';
+  $('#mDesc').textContent=ehArquivo
+    ? 'Escolha o arquivo .json que você baixou, ou cole o conteúdo aqui embaixo.'
+    : 'Selecione tudo e copie.';
+  $('#mFileRow').hidden=!ehArquivo;
+  $('#mOk').hidden=!ehArquivo;
+  $('#mText').value=txt||'';
+  $('#mFileName').textContent='nenhum arquivo escolhido';
+  $('#mask').classList.add('on');
+  if(!ehArquivo) setTimeout(()=>{ $('#mText').focus(); $('#mText').select(); },30);
+}
+const fecharModal=()=>$('#mask').classList.remove('on');
+$('#mCancel').onclick=fecharModal;
+$('#mask').addEventListener('mousedown',e=>{ if(e.target===$('#mask')) fecharModal(); });
+$('#mPick').onclick=()=>$('#fileJson').click();
+$('#fileJson').addEventListener('change',e=>{
+  const f=e.target.files[0]; if(!f) return;
+  $('#mFileName').textContent=f.name;
+  const r=new FileReader();
+  r.onload=()=>{ $('#mText').value=String(r.result||''); };
+  r.readAsText(f);
+  e.target.value='';
+});
+/* Aceita os dois formatos: o .json desta página (com "blocos" na raiz) e o
+   arquivo único do menu, que embrulha as três páginas — desse eu pego só a
+   fatia do Lab e deixo a calculadora e as Referências quietas. */
+function fatia(o){
+  if(!o||typeof o!=='object') return null;
+  if(Array.isArray(o.blocos)) return o;
+  if(o.lab&&Array.isArray(o.lab.blocos)) return o.lab;
+  return null;
+}
+$('#mOk').onclick=()=>{
+  if(modo!=='json') return fecharModal();
+  let novo;
+  try{ novo=JSON.parse($('#mText').value); }catch(err){ toast('arquivo inválido'); return; }
+  novo=fatia(novo);
+  if(!novo){ toast('esse arquivo não é um banco do Lab'); return; }
+  db={v:1,blocos:novo.blocos.map(b=>({
+    id:idOk(b.id), nome:String(b.nome||'Sem nome'), sub:String(b.sub||''),
+    linhas:(Array.isArray(b.linhas)?b.linhas:[]).map(l=>({id:idOk(l.id),label:String(l.label||''),a:clamp(l.a),f:clamp(l.f)}))
+  }))};
+  save(); render(); fecharModal(); toast('banco carregado');
+};
+
+/* ---------------- backup ---------------- */
+$('#bExpJson').onclick=()=>{
+  const blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  const d=new Date(), p=n=>String(n).padStart(2,'0');
+  a.href=URL.createObjectURL(blob);
+  a.download=`ddtank-lab-${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}.json`;
+  a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+  toast('arquivo baixado');
+};
+$('#bImpJson').onclick=()=>abrirModal('json','');
+$('#bWipe').onclick=async()=>{
+  const tiros=db.blocos.reduce((n,b)=>n+b.linhas.length,0);
+  const ok=await pedirOk({titulo:'Apagar tudo',
+    desc:`<p class="aviso">Apaga <b>${db.blocos.length} bloco(s)</b> e <b>${tiros} tiro(s)</b> deste navegador, sem desfazer. Baixe o backup antes se quiser guardar.</p>`});
+  if(!ok) return;
+  db={v:1,blocos:[]}; save(); render(); toast('tudo apagado');
+};
+
+/* ---------------- atalhos ---------------- */
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    if($('#dmask').classList.contains('on')) return $('#dCancel').click();
+    if($('#mask').classList.contains('on')) return fecharModal();
+  }
+});
+
+render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+# Exports do próprio app (Referências e Lab baixam o banco como .json,
+# e as telas de "copiar como texto" viram .txt). São dados de quem joga,
+# não fazem parte do site — ficam fora do repositório.
+*.json
+*.txt
+
+# Notas e rascunhos locais
+*.local
+*.bak
+*.orig
+*~
+
+# Sistema operacional / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/

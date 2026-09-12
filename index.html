@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<meta name="referrer" content="no-referrer">
+<title>Caderno de Tiro</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2032%2032%27%3E%3Crect%20width=%2732%27%20height=%2732%27%20rx=%277%27%20fill=%27%237d4517%27/%3E%3Crect%20x=%272.5%27%20y=%272.5%27%20width=%2727%27%20height=%2727%27%20rx=%275%27%20fill=%27%23f6e6c2%27%20stroke=%27%23a9721f%27%20stroke-width=%272%27/%3E%3Cpath%20d=%27M5%2025%20Q14%204%2027%2017%27%20fill=%27none%27%20stroke=%27%23a9721f%27%20stroke-width=%272.6%27%20stroke-linecap=%27round%27%20stroke-dasharray=%273%203%27/%3E%3Ccircle%20cx=%2727%27%20cy=%2717%27%20r=%274.2%27%20fill=%27%23d86a10%27%20stroke=%27%237d4517%27%20stroke-width=%271.6%27/%3E%3C/svg%3E">
+<style>
+  :root{
+    --wood1:#d79b4e; --wood2:#b06f2c; --wood3:#7d4517; --wood4:#5a3010;
+    --gold1:#ffe9a8; --gold2:#e8b954; --gold3:#a9721f;
+    --parch1:#fdf3dc; --parch2:#f3e2bb; --parch3:#e6cf9d;
+    --mint:#a9ddc6; --mint2:#c9ebdc;
+    --ink:#4a2d10; --ink2:#6f4d24; --ink3:#8a6a3d;
+    --red1:#e2663f; --red2:#b53b22;
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none !important}
+  html,body{margin:0}
+  body{
+    /* o conteúdo fica no centro da tela, em cima e embaixo, em qualquer altura.
+       margin:auto no filho centraliza sem cortar o topo quando não couber. */
+    display:flex;min-height:100vh;min-height:100dvh;padding:20px 14px;
+    background:
+      radial-gradient(1200px 600px at 50% -5%, #6fb0d8 0%, rgba(111,176,216,0) 55%),
+      linear-gradient(180deg,#3f7d4e 0%,#2f5f3d 35%,#27503a 100%);
+    background-attachment:fixed;
+    color:var(--ink);
+    font:14px/1.45 "Trebuchet MS","Segoe UI",Verdana,Geneva,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{width:100%;max-width:820px;margin:auto}
+
+  .frame{
+    background:linear-gradient(180deg,var(--wood1),var(--wood2) 45%,var(--wood3));
+    border:2px solid var(--wood4);border-radius:10px;
+    box-shadow:0 3px 0 #00000040, 0 10px 22px #00000038, inset 0 1px 0 #ffdca8a6;
+    padding:6px;
+  }
+  .plate{
+    background:linear-gradient(180deg,var(--parch1),var(--parch2));
+    border:2px solid var(--gold3);border-radius:7px;
+    box-shadow:inset 0 0 0 1px #fffaf0, inset 0 2px 6px #b5883f33;
+  }
+  .pad{padding:12px 14px}
+
+  /* ---------- título em ascii ---------- */
+  .capa{margin-bottom:10px}
+  .capa .plate{padding:14px 10px 12px;text-align:center;overflow:hidden}
+  .arte{
+    margin:0;display:inline-block;text-align:left;
+    font-family:ui-monospace,"Cascadia Mono",Consolas,"DejaVu Sans Mono",monospace;
+    /* 55 colunas: o tamanho acompanha a janela e para de crescer aos 820px */
+    font-size:clamp(4px,2.3vw,19px);
+    line-height:1.02;letter-spacing:0;white-space:pre;
+    color:var(--wood3);text-shadow:0 1px 0 #fffaf0, 0 2px 3px #7d451726;
+  }
+  .capa .sub{
+    margin:9px 0 0;font-size:12px;color:var(--ink3);
+    text-transform:uppercase;letter-spacing:.14em;font-weight:700;
+  }
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+
+  /* ---------- botões ---------- */
+  button{
+    font:inherit;font-weight:700;color:#fff5dd;
+    background:linear-gradient(180deg,#e9a94a,#c1741f 55%,#9c561a);
+    border:1px solid #6d3a10;border-radius:7px;padding:7px 12px;cursor:pointer;
+    text-shadow:0 1px 0 #5b3210;
+    box-shadow:inset 0 1px 0 #ffe1a8a6, 0 2px 0 #6d3a10, 0 3px 6px #00000030;
+    transition:filter .1s, transform .04s;
+  }
+  button:hover{filter:brightness(1.09)}
+  button:active{transform:translateY(2px);box-shadow:inset 0 1px 0 #ffe1a880,0 0 0 #6d3a10}
+  button:disabled{opacity:.45;cursor:default;transform:none;filter:none}
+  button.ghost{
+    background:linear-gradient(180deg,#fdf1d6,#ead7ac);color:var(--ink);
+    border-color:var(--gold3);text-shadow:0 1px 0 #fffaf0;
+    box-shadow:inset 0 1px 0 #fffdf4, 0 2px 0 #b98c3e, 0 3px 6px #00000022;
+  }
+  button.ghost:hover{background:linear-gradient(180deg,#fff7e2,#f2dfb4)}
+  button.danger{
+    background:linear-gradient(180deg,var(--red1),var(--red2));border-color:#7d2413;
+    box-shadow:inset 0 1px 0 #ffb9a2a6, 0 2px 0 #7d2413, 0 3px 6px #00000030;
+  }
+
+  /* ---------- atalhos ---------- */
+  .atalhos{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
+  .atalho{display:block;text-decoration:none;color:inherit;outline:none}
+  .atalho .frame{
+    height:100%;
+    transition:transform .14s cubic-bezier(.34,1.4,.64,1), box-shadow .18s;
+  }
+  .atalho:hover .frame,
+  .atalho:focus-visible .frame{
+    transform:translateY(-4px);
+    box-shadow:0 5px 0 #00000040, 0 14px 26px #00000045,
+               inset 0 1px 0 #ffdca8a6, 0 0 0 2px #ffd0628c;
+  }
+  .atalho:active .frame{transform:translateY(0);transition-duration:.06s}
+  .atalho .plate{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;
+    padding:18px 12px;text-align:center;height:100%;
+    transition:background .18s;
+  }
+  .atalho:hover .plate,
+  .atalho:focus-visible .plate{background:linear-gradient(180deg,#fff9e9,#f7e8c6)}
+  .atalho svg{width:32px;height:32px;display:block}
+  .atalho span{font-size:12px;color:var(--ink3);line-height:1.4}
+
+  /* o nome ganha um risco dourado que corre da esquerda para a direita */
+  .atalho b{position:relative;font-size:15px;padding-bottom:3px}
+  .atalho b::after{
+    content:"";position:absolute;left:0;right:0;bottom:0;height:2px;border-radius:2px;
+    background:linear-gradient(90deg,var(--gold2),#d86a10);
+    transform:scaleX(0);transform-origin:left;transition:transform .26s ease-out;
+  }
+  .atalho:hover b::after,
+  .atalho:focus-visible b::after{transform:scaleX(1)}
+
+  /* --- cada ícone anima do jeito da sua página --- */
+  .atalho svg *{transform-box:fill-box}
+
+  /* calculadora: os pontos correm pela trajetória e a bola bate no alvo */
+  @keyframes tiro{ to{stroke-dashoffset:-24} }
+  @keyframes impacto{ 0%,100%{transform:scale(1)} 45%{transform:scale(1.3)} }
+  .atalho:hover .traj,
+  .atalho:focus-visible .traj{animation:tiro .8s linear infinite}
+  .atalho:hover .alvo,
+  .atalho:focus-visible .alvo{animation:impacto .8s ease-in-out infinite;transform-origin:center}
+
+  /* referências: as linhas da tabela entram uma atrás da outra */
+  @keyframes varre{ from{transform:scaleX(.12);opacity:.3} to{transform:scaleX(1);opacity:1} }
+  .atalho:hover .linha,
+  .atalho:focus-visible .linha{animation:varre .42s ease-out both;transform-origin:left center}
+  .atalho:hover .l2,.atalho:focus-visible .l2{animation-delay:.07s}
+  .atalho:hover .l3,.atalho:focus-visible .l3{animation-delay:.14s}
+
+  /* lab: as bolhas sobem no frasco */
+  @keyframes sobe{
+    0%{transform:translateY(3px) scale(.7);opacity:.2}
+    45%{opacity:1}
+    100%{transform:translateY(-9px) scale(1);opacity:0}
+  }
+  .atalho:hover .bolha,
+  .atalho:focus-visible .bolha{animation:sobe 1.15s ease-in-out infinite;transform-origin:center}
+  .atalho:hover .b2,.atalho:focus-visible .b2{animation-delay:.42s}
+
+  @media (prefers-reduced-motion:reduce){
+    .atalho .frame,.atalho .plate,.atalho b::after{transition:none}
+    .atalho svg *{animation:none !important}
+  }
+
+  /* ---------- backup ---------- */
+  .lbl{
+    font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;
+    color:var(--ink2);margin-bottom:7px
+  }
+  .bk p{margin:0 0 10px;font-size:12px;color:var(--ink3);line-height:1.5}
+  .estado{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:11px;font-size:12px;color:var(--ink3)}
+  .estado b{font-size:15px;color:var(--ink);font-variant-numeric:tabular-nums}
+  .bkrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+  /* ---------- modal ---------- */
+  .mask{
+    position:fixed;inset:0;background:#1b2e22cc;display:none;
+    align-items:center;justify-content:center;padding:16px;z-index:40;
+  }
+  .mask.on{display:flex}
+  .modal{width:min(600px,100%);max-height:86vh;display:flex;flex-direction:column}
+  .modal .plate{display:flex;flex-direction:column;overflow:hidden;max-height:calc(86vh - 12px)}
+  .modal h3{margin:0;padding:11px 14px;font-size:15px;border-bottom:2px solid #e2cb9b}
+  .mbody{padding:12px 14px;overflow:auto;min-height:0}
+  .mbody>p{margin:0 0 10px;font-size:12.5px;color:var(--ink2);line-height:1.5}
+  .mfilerow{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+  .mfilerow .nome{font-size:12px;color:var(--ink3)}
+  textarea{
+    width:100%;min-height:110px;resize:vertical;font:12px/1.45 ui-monospace,Consolas,monospace;
+    color:var(--ink);background:#fffdf4;border:2px solid var(--gold3);border-radius:7px;padding:8px;
+  }
+  .prev{
+    white-space:pre-wrap;font:12px/1.5 ui-monospace,Consolas,monospace;
+    background:#fffdf4;border:1px dashed #cdb17a;border-radius:7px;
+    padding:9px 11px;margin-top:10px;max-height:190px;overflow:auto;color:var(--ink2);
+  }
+  .mfoot{display:flex;gap:8px;justify-content:flex-end;padding:11px 14px;border-top:2px solid #e2cb9b;flex-wrap:wrap}
+  .mfoot .esq{margin-right:auto}
+  .aviso{color:var(--red2);font-weight:700}
+
+  #toast{
+    position:fixed;left:50%;bottom:22px;transform:translate(-50%,20px);
+    background:#2f5f3d;color:#fdf3dc;border:2px solid #1e3f2b;border-radius:8px;
+    padding:9px 15px;font-weight:700;font-size:13px;opacity:0;pointer-events:none;
+    transition:opacity .16s,transform .16s;z-index:60;
+  }
+  #toast.on{opacity:1;transform:translate(-50%,0)}
+
+  @media (max-width:640px){
+    .atalhos{grid-template-columns:1fr}
+    .mask{padding:10px}
+    .modal{max-height:92vh}
+    .modal .plate{max-height:calc(92vh - 12px)}
+    .mbody{padding:10px}
+    .mfoot{padding:9px 10px}
+    .mfoot button{flex:1 1 auto}
+  }
+  @media (max-width:420px){
+    body{padding:14px 8px}
+    .arte{font-size:2.5vw}
+    .bkrow button{flex:1 1 auto}
+    .bkrow #bWipe{margin-left:0}
+    .estado{gap:10px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="capa frame"><div class="plate">
+    <h1 class="sr">Caderno de Tiro</h1>
+    <pre class="arte" aria-hidden="true"> ████    ████   █████   ██████  █████   ██   ██   ████ 
+██      ██  ██  ██  ██  ██      ██  ██  ███  ██  ██  ██
+██      ██████  ██  ██  █████   █████   ██ █ ██  ██  ██
+██      ██  ██  ██  ██  ██      ██ ██   ██  ███  ██  ██
+ ████   ██  ██  █████   ██████  ██  ██  ██   ██   ████ 
+                                                       
+    █████   ██████       ██████  ██  █████    ████     
+    ██  ██  ██             ██    ██  ██  ██  ██  ██    
+    ██  ██  █████          ██    ██  █████   ██  ██    
+    ██  ██  ██             ██    ██  ██ ██   ██  ██    
+    █████   ██████         ██    ██  ██  ██   ████     </pre>
+    <p class="sub">DDTank Classic</p>
+  </div></div>
+
+  <div class="atalhos">
+    <a class="atalho" href="calculadora.html"><div class="frame"><div class="plate">
+      <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <path class="traj" d="M4 26 Q14 4 28 16" stroke="#a9721f" stroke-width="2.6"
+              stroke-linecap="round" stroke-dasharray="3 3"/>
+        <circle class="alvo" cx="28" cy="16" r="4" fill="#d86a10" stroke="#7d4517" stroke-width="1.6"/>
+        <circle cx="4" cy="26" r="2.4" fill="#7d4517"/>
+      </svg>
+      <b>Calculadora de tiro</b>
+      <span>distância e vento → ângulo e força</span>
+    </div></div></a>
+
+    <a class="atalho" href="referencias.html"><div class="frame"><div class="plate">
+      <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <rect x="4" y="3.5" width="24" height="25" rx="4" fill="#fdf3dc" stroke="#a9721f" stroke-width="2"/>
+        <rect class="linha l1" x="8" y="8" width="16" height="4" fill="#e0c890"/>
+        <rect class="linha l2" x="8" y="15" width="16" height="4" fill="#a9ddc6"/>
+        <rect class="linha l3" x="8" y="22" width="16" height="4" fill="#a9ddc6"/>
+        <path d="M16 8v18" stroke="#a9721f" stroke-width="1.4"/>
+      </svg>
+      <b>Referências</b>
+      <span>por instância, stage e tiro</span>
+    </div></div></a>
+
+    <a class="atalho" href="lab.html"><div class="frame"><div class="plate">
+      <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <path d="M13 6.5v6L8.5 23a2 2 0 0 0 1.8 3h11.4a2 2 0 0 0 1.8-3L19 12.5v-6z"
+              fill="#a9ddc6" stroke="#a9721f" stroke-width="1.6" stroke-linejoin="round"/>
+        <path d="M11.4 6.5h9.2" stroke="#a9721f" stroke-width="1.8" stroke-linecap="round"/>
+        <circle class="bolha b1" cx="14.5" cy="21" r="1.4" fill="#e0a52c"/>
+        <circle class="bolha b2" cx="18.5" cy="23.5" r="1" fill="#e0a52c"/>
+      </svg>
+      <b>Lab</b>
+      <span>blocos livres de ângulos</span>
+    </div></div></a>
+  </div>
+
+  <div class="frame"><div class="plate pad bk">
+    <div class="lbl">Backup</div>
+    <p>Um <b>.json</b> com as três páginas dentro. As Referências e o Lab aceitam o mesmo arquivo.</p>
+    <div class="estado" id="estado"></div>
+    <div class="bkrow">
+      <button id="bExp">⬇ Baixar tudo</button>
+      <button class="ghost" id="bImp">⬆ Carregar</button>
+      <button class="danger" id="bWipe" style="margin-left:auto">apagar tudo</button>
+    </div>
+    <input type="file" id="file" accept=".json,application/json" hidden>
+  </div></div>
+
+</div>
+
+<div class="mask" id="mask">
+  <div class="modal frame"><div class="plate">
+    <h3 id="mTitle">Carregar arquivo</h3>
+    <div class="mbody">
+      <p id="mDesc"></p>
+      <div class="mfilerow">
+        <button type="button" class="ghost" id="mPick">Escolher arquivo .json…</button>
+        <span class="nome" id="mFileName">nenhum arquivo escolhido</span>
+      </div>
+      <textarea id="mText" spellcheck="false" placeholder="…ou cole aqui o conteúdo do arquivo"></textarea>
+      <div class="prev" id="mPrev" hidden></div>
+    </div>
+    <div class="mfoot">
+      <button type="button" class="ghost esq" id="mCancel">Fechar</button>
+      <button type="button" id="mOk" disabled>Substituir tudo</button>
+    </div>
+  </div></div>
+</div>
+
+<div class="mask" id="dmask">
+  <div class="modal frame" style="width:min(440px,100%)"><div class="plate">
+    <h3 id="dTitle">Confirmar</h3>
+    <div class="mbody"><p id="dDesc"></p></div>
+    <div class="mfoot">
+      <button type="button" class="ghost" id="dCancel">Cancelar</button>
+      <button type="button" class="danger" id="dOk">Apagar</button>
+    </div>
+  </div></div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+(function(){
+"use strict";
+/* ===========================================================================
+   MENU + BACKUP ÚNICO
+
+   As quatro páginas moram no mesmo endereço, então dividem o mesmo
+   localStorage. É por isso que dá para ter um arquivo só: aqui eu leio e
+   escrevo as três chaves de uma vez. Cada página continua guardando a sua e
+   continua aceitando este mesmo arquivo — pegando de dentro dele só o pedaço
+   que é dela.
+
+   Formato:
+     { app:'caderno-de-tiro', v:1, exportado:'<data ISO>',
+       calculadora:{…}, referencias:{v:1,instances:[…]}, lab:{v:1,blocos:[…]} }
+   =========================================================================== */
+const CHAVES={ calculadora:'ddtank_calc', referencias:'ddtank_af_v1', lab:'ddtank_lab_v1' };
+
+const $=s=>document.querySelector(s);
+const uid=()=>Math.random().toString(36).slice(2,9);
+/* Os ids de um arquivo importado vão para dentro de atributos HTML nas outras
+   páginas. Um id com aspas quebraria o atributo e deixaria quem mandou o .json
+   rodar script ali. Só aceito o formato que o uid() gera. */
+const idOk=v=>typeof v==='string'&&/^[A-Za-z0-9_-]{1,40}$/.test(v)?v:uid();
+const clamp=n=>{ n=parseInt(n,10); if(isNaN(n))n=0; return Math.max(0,Math.min(999,n)); };
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function toast(m){
+  const t=$('#toast'); t.textContent=m; t.classList.add('on');
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('on'),1900);
+}
+const ler=k=>{ try{ return JSON.parse(localStorage.getItem(k)); }catch(e){ return null; } };
+
+/* --- as mesmas regras de saneamento das outras páginas, para um arquivo de
+       fora nunca entrar com um id que quebre o HTML nem com número inventado --- */
+function sanRef(o){
+  return {v:1, verVazias:!!(o&&o.verVazias), catalogo2:1,
+    instances:(o&&Array.isArray(o.instances)?o.instances:[]).filter(i=>i&&typeof i==='object').map(i=>({
+      id:idOk(i.id), name:String(i.name||'').trim()||'Sem nome', collapsed:!!i.collapsed,
+      stages:(Array.isArray(i.stages)?i.stages:[]).filter(x=>x&&typeof x==='object').map(st=>({
+        id:idOk(st.id), name:String(st.name||'').trim()||'Geral',
+        shots:(Array.isArray(st.shots)?st.shots:[]).filter(h=>h&&typeof h==='object').map(h=>({
+          id:idOk(h.id), label:String(h.label||'').trim(), a:clamp(h.a), f:clamp(h.f)
+        }))
+      }))
+    }))};
+}
+function sanLab(o){
+  return {v:1, blocos:(o&&Array.isArray(o.blocos)?o.blocos:[]).filter(b=>b&&typeof b==='object').map(b=>({
+    id:idOk(b.id), nome:String(b.nome||'Sem nome'), sub:String(b.sub||''),
+    linhas:(Array.isArray(b.linhas)?b.linhas:[]).filter(l=>l&&typeof l==='object').map(l=>({
+      id:idOk(l.id), label:String(l.label||''), a:clamp(l.a), f:clamp(l.f)
+    }))
+  }))};
+}
+function sanCalc(o){
+  if(!o||typeof o!=='object') return null;
+  const num=(v,min,max,pad)=>{ v=Number(v); return isFinite(v)?Math.max(min,Math.min(max,v)):pad; };
+  const ov={};
+  /* a chave é sempre "ângulo|distância"; qualquer outra coisa fica de fora */
+  if(o.ov&&typeof o.ov==='object')
+    for(const k of Object.keys(o.ov)) if(/^\d{1,3}\|\d{1,3}$/.test(k)) ov[k]=clamp(o.ov[k]);
+  return {
+    d:num(o.d,1,20,10), w:num(o.w,0,6,0), favor:!!o.favor,
+    ang:o.ang==='full'?'full':num(o.ang,5,89,65),
+    eu:(o.eu===null||o.eu===undefined)?null:num(o.eu,0,10,null),
+    alvo:(o.alvo===null||o.alvo===undefined)?null:num(o.alvo,0,10,null),
+    tp:!!o.tp, compacto:!!o.compacto, ov
+  };
+}
+
+/* ----------------------- o que está salvo neste navegador ----------------------- */
+function resumo(){
+  const ref=sanRef(ler(CHAVES.referencias)||{}), lab=sanLab(ler(CHAVES.lab)||{});
+  const calc=ler(CHAVES.calculadora);
+  return {
+    tiros:ref.instances.reduce((a,i)=>a+i.stages.reduce((b,s)=>b+s.shots.length,0),0),
+    linhas:lab.blocos.reduce((a,b)=>a+b.linhas.length,0),
+    blocos:lab.blocos.length,
+    medidos:(calc&&calc.ov&&typeof calc.ov==='object')?Object.keys(calc.ov).length:0
+  };
+}
+const vazio=r=>!(r.tiros||r.linhas||r.medidos||r.blocos);
+function pintarEstado(){
+  const r=resumo();
+  $('#estado').innerHTML=
+    `<span><b>${r.medidos}</b> força${r.medidos===1?'':'s'} medida${r.medidos===1?'':'s'}</span>`+
+    `<span><b>${r.tiros}</b> tiro${r.tiros===1?'':'s'} nas referências</span>`+
+    `<span><b>${r.linhas}</b> linha${r.linhas===1?'':'s'} no lab</span>`;
+  $('#bExp').disabled=vazio(r);
+  $('#bWipe').disabled=vazio(r);
+}
+pintarEstado();
+
+/* -------------------------------- baixar tudo -------------------------------- */
+$('#bExp').addEventListener('click',()=>{
+  const pac={
+    app:'caderno-de-tiro', v:1, exportado:new Date().toISOString(),
+    calculadora:ler(CHAVES.calculadora)||null,
+    referencias:sanRef(ler(CHAVES.referencias)||{}),
+    lab:sanLab(ler(CHAVES.lab)||{})
+  };
+  const d=new Date(), p=n=>String(n).padStart(2,'0');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(pac,null,2)],{type:'application/json'}));
+  a.download=`caderno-de-tiro-${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}.json`;
+  a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+  toast('arquivo baixado');
+});
+
+/* ------------------------------- carregar tudo ------------------------------- */
+let pacote=null;
+const fecharModal=()=>{ $('#mask').classList.remove('on'); pacote=null; };
+$('#bImp').addEventListener('click',()=>{
+  pacote=null;
+  $('#mText').value=''; $('#mPrev').hidden=true; $('#mOk').disabled=true;
+  $('#mFileName').textContent='nenhum arquivo escolhido';
+  $('#mDesc').innerHTML='Escolha o <b>.json</b> baixado aqui, ou cole o conteúdo abaixo. '+
+    'Ele entra no lugar do que está guardado neste navegador.';
+  $('#mask').classList.add('on');
+  setTimeout(()=>$('#mPick').focus(),40);
+});
+$('#mCancel').addEventListener('click',fecharModal);
+$('#mask').addEventListener('mousedown',e=>{ if(e.target===$('#mask')) fecharModal(); });
+$('#mPick').addEventListener('click',()=>$('#file').click());
+$('#file').addEventListener('change',e=>{
+  const f=e.target.files&&e.target.files[0]; if(!f)return;
+  $('#mFileName').textContent=f.name;
+  const r=new FileReader();
+  r.onload=()=>{ $('#mText').value=String(r.result||''); lerPacote(); };
+  r.onerror=()=>toast('não consegui ler o arquivo');
+  r.readAsText(f);
+  e.target.value='';
+});
+$('#mText').addEventListener('input',()=>{ $('#mFileName').textContent='colado à mão'; lerPacote(); });
+
+/* aceita o arquivo novo (as três páginas de uma vez) e também os antigos,
+   baixados de dentro das Referências ou do Lab */
+function normalizar(o){
+  if(!o||typeof o!=='object') return null;
+  if(Array.isArray(o.instances)) return {referencias:sanRef(o), lab:null, calculadora:null, tipo:'só referências'};
+  if(Array.isArray(o.blocos))    return {referencias:null, lab:sanLab(o), calculadora:null, tipo:'só lab'};
+  if(o.referencias||o.lab||o.calculadora) return {
+    referencias:o.referencias?sanRef(o.referencias):null,
+    lab:o.lab?sanLab(o.lab):null,
+    calculadora:sanCalc(o.calculadora),
+    tipo:'completo'
+  };
+  return null;
+}
+function lerPacote(){
+  pacote=null; $('#mOk').disabled=true;
+  const txt=$('#mText').value.trim();
+  if(!txt){ $('#mPrev').hidden=true; return; }
+  let o=null; try{ o=JSON.parse(txt); }catch(e){}
+  const n=normalizar(o);
+  $('#mPrev').hidden=false;
+  if(!n){
+    $('#mPrev').innerHTML='<b style="color:#b53b22">Não parece um banco do Caderno de Tiro.</b>\n'+
+      'O arquivo tem de ser um .json baixado aqui, nas Referências ou no Lab.';
+    return;
+  }
+  pacote=n;
+  const linhas=[];
+  if(n.calculadora) linhas.push('calculadora · '+Object.keys(n.calculadora.ov).length+' força(s) medida(s)');
+  if(n.referencias){
+    const t=n.referencias.instances.reduce((a,i)=>a+i.stages.reduce((b,s)=>b+s.shots.length,0),0);
+    linhas.push('referências · '+n.referencias.instances.length+' instância(s), '+t+' tiro(s)');
+    n.referencias.instances.filter(i=>i.stages.some(s=>s.shots.length)).slice(0,8)
+      .forEach(i=>linhas.push('      '+esc(i.name)));
+  }
+  if(n.lab){
+    linhas.push('lab · '+n.lab.blocos.length+' bloco(s), '+
+      n.lab.blocos.reduce((a,b)=>a+b.linhas.length,0)+' linha(s)');
+  }
+  const r=resumo();
+  $('#mPrev').innerHTML=
+    '<b>No arquivo</b> ('+n.tipo+')\n'+linhas.join('\n')+
+    '\n\n<b>Aqui agora</b>\n'+r.tiros+' tiro(s) · '+r.linhas+' linha(s) no Lab · '+
+    r.medidos+' força(s) medida(s)'+
+    (n.tipo==='completo'?'':'\n\nEste arquivo traz '+n.tipo+'; o resto fica como está.');
+  $('#mOk').disabled=false;
+}
+$('#mOk').addEventListener('click',async()=>{
+  if(!pacote)return;
+  const ok=await pedirOk({
+    titulo:'Substituir o que está salvo?',
+    desc:'O conteúdo do arquivo entra no lugar do que está guardado neste navegador. '+
+         'Se ainda não baixou o seu, feche isto e baixe antes.',
+    ok:'Substituir'
+  });
+  if(!ok)return;
+  try{
+    if(pacote.calculadora) localStorage.setItem(CHAVES.calculadora,JSON.stringify(pacote.calculadora));
+    if(pacote.referencias) localStorage.setItem(CHAVES.referencias,JSON.stringify(pacote.referencias));
+    if(pacote.lab)         localStorage.setItem(CHAVES.lab,JSON.stringify(pacote.lab));
+  }catch(e){ toast('o navegador recusou salvar'); return; }
+  fecharModal(); pintarEstado(); toast('tudo carregado');
+});
+
+/* --------------------------------- apagar tudo --------------------------------- */
+$('#bWipe').addEventListener('click',async()=>{
+  const r=resumo();
+  if(vazio(r)){ toast('não há nada salvo'); return; }
+  const ok=await pedirOk({
+    titulo:'Apagar tudo?',
+    desc:'Saem os <b>'+r.tiros+' tiro(s)</b> das Referências, as <b>'+r.linhas+' linha(s)</b> do Lab '+
+         'e as <b>'+r.medidos+' força(s)</b> medidas na calculadora. Não dá para desfazer.',
+    ok:'Apagar tudo'
+  });
+  if(!ok)return;
+  try{ Object.keys(CHAVES).forEach(k=>localStorage.removeItem(CHAVES[k])); }catch(e){}
+  pintarEstado(); toast('tudo apagado');
+});
+
+/* ------------- confirmação própria, no lugar do confirm() do navegador ------------- */
+const dlg={aberto:false,fim:null,antes:null};
+function pedirOk(o){
+  dlg.aberto=true; dlg.antes=document.activeElement;
+  $('#dTitle').textContent=o.titulo||'Confirmar';
+  $('#dDesc').innerHTML='<span class="aviso">'+(o.desc||'')+'</span>';
+  $('#dOk').textContent=o.ok||'OK';
+  $('#dmask').classList.add('on');
+  setTimeout(()=>$('#dOk').focus(),40);
+  return new Promise(res=>{ dlg.fim=res; });
+}
+function fecharDlg(v){
+  if(!dlg.aberto)return;
+  dlg.aberto=false; $('#dmask').classList.remove('on');
+  const fim=dlg.fim; dlg.fim=null;
+  try{ if(dlg.antes&&dlg.antes.focus)dlg.antes.focus(); }catch(e){}
+  if(fim)fim(v);
+}
+$('#dOk').addEventListener('click',()=>fecharDlg(true));
+$('#dCancel').addEventListener('click',()=>fecharDlg(false));
+$('#dmask').addEventListener('mousedown',e=>{ if(e.target===$('#dmask')) fecharDlg(false); });
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Escape')return;
+  if(dlg.aberto) fecharDlg(false);
+  else if($('#mask').classList.contains('on')) fecharModal();
+});
+})();
+</script>
+</body>
+</html>

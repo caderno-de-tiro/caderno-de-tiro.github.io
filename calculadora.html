@@ -1,0 +1,801 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<meta name="referrer" content="no-referrer">
+<title>Calculadora — Caderno de Tiro</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2032%2032%27%3E%3Crect%20width=%2732%27%20height=%2732%27%20rx=%277%27%20fill=%27%237d4517%27/%3E%3Crect%20x=%272.5%27%20y=%272.5%27%20width=%2727%27%20height=%2727%27%20rx=%275%27%20fill=%27%23f6e6c2%27%20stroke=%27%23a9721f%27%20stroke-width=%272%27/%3E%3Cpath%20d=%27M5%2025%20Q14%204%2027%2017%27%20fill=%27none%27%20stroke=%27%23a9721f%27%20stroke-width=%272.6%27%20stroke-linecap=%27round%27%20stroke-dasharray=%273%203%27/%3E%3Ccircle%20cx=%2727%27%20cy=%2717%27%20r=%274.2%27%20fill=%27%23d86a10%27%20stroke=%27%237d4517%27%20stroke-width=%271.6%27/%3E%3C/svg%3E">
+<style>
+  :root{
+    --wood1:#d79b4e; --wood2:#b06f2c; --wood3:#7d4517; --wood4:#5a3010;
+    --gold1:#ffe9a8; --gold2:#e8b954; --gold3:#a9721f;
+    --parch1:#fdf3dc; --parch2:#f3e2bb; --parch3:#e6cf9d;
+    --mint:#a9ddc6; --mint2:#c9ebdc;
+    --ink:#4a2d10; --ink2:#6f4d24; --ink3:#8a6a3d;
+    --red1:#e2663f; --red2:#b53b22;
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none !important}
+  html,body{margin:0;min-height:100%}
+  body{
+    background:
+      radial-gradient(1200px 600px at 50% -5%, #6fb0d8 0%, rgba(111,176,216,0) 55%),
+      linear-gradient(180deg,#3f7d4e 0%,#2f5f3d 35%,#27503a 100%);
+    background-attachment:fixed;
+    color:var(--ink);
+    font:14px/1.45 "Trebuchet MS","Segoe UI",Verdana,Geneva,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1220px;margin:0 auto;padding:14px 14px 40px}
+
+  .frame{
+    background:linear-gradient(180deg,var(--wood1),var(--wood2) 45%,var(--wood3));
+    border:2px solid var(--wood4);border-radius:10px;
+    box-shadow:0 3px 0 #00000040, 0 10px 22px #00000038, inset 0 1px 0 #ffdca8a6;
+    padding:6px;
+  }
+  .plate{
+    background:linear-gradient(180deg,var(--parch1),var(--parch2));
+    border:2px solid var(--gold3);border-radius:7px;
+    box-shadow:inset 0 0 0 1px #fffaf0, inset 0 2px 6px #b5883f33;
+  }
+
+  /* ---------- menu ---------- */
+  .nav{display:flex;gap:6px;margin:0 0 12px;align-items:flex-end}
+  .nav a{
+    text-decoration:none;display:block;padding:8px 18px;font-weight:700;font-size:14px;
+    color:#f3e0b6;background:linear-gradient(180deg,#b57b34,#8d5218);
+    border:2px solid var(--wood4);border-bottom:0;border-radius:9px 9px 0 0;
+    text-shadow:0 1px 0 #5b3210;box-shadow:inset 0 1px 0 #ffdca880;position:relative;top:2px
+  }
+  .nav a:hover{filter:brightness(1.1)}
+  .nav a.home{
+    background:linear-gradient(180deg,#8d6b3f,#66431a);color:#e8d3ac;
+    padding-left:12px;padding-right:12px;margin-right:4px
+  }
+  .nav a.on{
+    color:var(--ink);background:linear-gradient(180deg,var(--parch1),var(--parch2));
+    text-shadow:0 1px 0 #fffaf0;top:0;padding-bottom:10px;
+    box-shadow:inset 0 1px 0 #fffdf4,0 -2px 6px #00000022
+  }
+
+  /* ---------- botões ---------- */
+  button{
+    font:inherit;font-weight:700;color:#fff5dd;
+    background:linear-gradient(180deg,#e9a94a,#c1741f 55%,#9c561a);
+    border:1px solid #6d3a10;border-radius:7px;padding:7px 12px;cursor:pointer;
+    text-shadow:0 1px 0 #5b3210;
+    box-shadow:inset 0 1px 0 #ffe1a8a6, 0 2px 0 #6d3a10, 0 3px 6px #00000030;
+    transition:filter .1s, transform .04s;
+  }
+  button:hover{filter:brightness(1.09)}
+  button:active{transform:translateY(2px);box-shadow:inset 0 1px 0 #ffe1a880,0 0 0 #6d3a10}
+  button.ghost{
+    background:linear-gradient(180deg,#fdf1d6,#ead7ac);color:var(--ink);
+    border-color:var(--gold3);text-shadow:0 1px 0 #fffaf0;
+    box-shadow:inset 0 1px 0 #fffdf4, 0 2px 0 #b98c3e, 0 3px 6px #00000022;
+  }
+  button.ghost:hover{background:linear-gradient(180deg,#fff7e2,#f2dfb4)}
+  button.on{
+    background:linear-gradient(180deg,#ffd062,#f09218 50%,#d86a10);border-color:#8a3f08;color:#fff8e6;
+    text-shadow:0 1px 0 #7a3608;box-shadow:inset 0 1px 0 #ffe9b0, 0 2px 0 #8a3f08, 0 0 0 2px #ffcf6b66
+  }
+
+  /* ---------- entradas ---------- */
+  .board{display:grid;grid-template-columns:1.15fr 1fr;gap:12px;align-items:start}
+  .pad{padding:9px 11px 11px}
+  .lbl{
+    font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;
+    color:var(--ink2);margin-bottom:5px
+  }
+  .valrow{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+  .bigval{
+    font:700 40px/1 "Trebuchet MS",sans-serif;color:var(--ink);min-width:96px;
+    text-align:center;padding:2px 8px;border:2px solid var(--gold3);border-radius:7px;
+    background:linear-gradient(180deg,#fffdf4,#f7ecd2);box-shadow:inset 0 2px 5px #b5883f2e;
+    font-variant-numeric:tabular-nums
+  }
+  .bigval small{font-size:14px;color:var(--ink3);font-weight:400}
+  .step{padding:6px 13px;font-size:17px;line-height:1}
+  .grid{display:grid;gap:4px}
+  .grid.d{grid-template-columns:repeat(10,1fr)}
+  .grid.w{grid-template-columns:repeat(7,1fr)}
+  .grid button{padding:7px 0;font-size:13px;border-radius:6px}
+  .dirrow{display:flex;gap:5px;margin-bottom:8px}
+  .dirrow button{flex:1;padding:8px 4px;font-size:13px}
+
+  /* ---------- faixa do minimapa ---------- */
+  .mm{display:grid;grid-template-columns:repeat(11,1fr);gap:3px}
+  .mm button{
+    padding:5px 0 4px;border-radius:5px;min-width:0;line-height:1.1;
+    box-shadow:inset 0 1px 0 #fffdf4,0 2px 0 #b98c3e
+  }
+  .mm button b{display:block;font-size:15px;font-variant-numeric:tabular-nums}
+  .mm button i{display:block;font-style:normal;font-size:9.5px;min-height:12px;opacity:.75}
+  .mm button.eu{
+    background:linear-gradient(180deg,#7fc7e8,#2f7fae);color:#fff;border-color:#1d5a7a;
+    text-shadow:0 1px 0 #14506e;box-shadow:inset 0 1px 0 #bfe6f7,0 2px 0 #1d5a7a
+  }
+  .mm button.alvo{
+    background:linear-gradient(180deg,#f09a7a,#c8412a);color:#fff;border-color:#7d2413;
+    text-shadow:0 1px 0 #7d2413;box-shadow:inset 0 1px 0 #ffc9b6,0 2px 0 #7d2413
+  }
+  .mmhead{display:flex;align-items:baseline;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+  .mmhead .dica{font-size:11px;color:var(--ink3)}
+  .mmhead button{padding:2px 9px;font-size:11px;margin-left:auto}
+
+  /* ---------- correção pós-tiro ---------- */
+  .erro{display:flex;gap:6px;justify-content:center;margin-top:8px;flex-wrap:wrap}
+  .erro button{padding:5px 13px;font-size:12px}
+  .erro .tit{
+    align-self:center;font-size:11px;color:var(--ink3);font-weight:700;
+    text-transform:uppercase;letter-spacing:.06em;margin-right:2px
+  }
+
+  /* ---------- resultado ---------- */
+  .res{margin-top:12px}
+  .tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:9px}
+  .tabs button{padding:6px 14px;font-size:13px}
+  .out{display:flex;align-items:center;justify-content:center;gap:clamp(20px,6vw,64px);padding:8px 0 4px;flex-wrap:wrap}
+  .big{text-align:center}
+  .big span{
+    display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;
+    color:var(--ink3);margin-bottom:2px
+  }
+  .big strong{
+    display:block;font:700 clamp(56px,9vw,86px)/.9 "Trebuchet MS",sans-serif;
+    font-variant-numeric:tabular-nums;color:var(--ink);text-shadow:0 2px 0 #fffaf0,0 3px 5px #b5883f40
+  }
+  .big.f strong{color:#a3480d}
+  .big.bad strong{font-size:26px;color:var(--red2);line-height:1.2;padding:18px 0}
+  .alt{
+    text-align:center;font-size:12.5px;color:var(--ink2);border-top:1px dashed #c8ab74;
+    margin-top:8px;padding-top:7px
+  }
+  .alt b{color:#a3480d}
+  .alt .rule{color:var(--ink3);font-size:11.5px;display:block;margin-top:2px}
+
+  /* ---------- tabelas de referência ---------- */
+  .refs{margin-top:12px}
+  .refhead{display:flex;align-items:baseline;gap:9px;padding:2px 4px 8px;flex-wrap:wrap}
+  .refhead h2{margin:0;font-size:15px;color:#fff4d8;text-shadow:0 1px 0 #5b3210;font-weight:700}
+  .refhead p{margin:0;font-size:11.5px;color:#f0dcb4;text-shadow:0 1px 0 #00000050}
+  .tables{display:grid;grid-template-columns:repeat(auto-fit,minmax(232px,1fr));gap:9px}
+  .tbox{padding:6px 7px 7px}
+  .tbox h3{
+    margin:0 0 5px;text-align:center;font-size:14px;font-weight:700;color:var(--ink);
+    text-shadow:0 1px 0 #fffaf0
+  }
+  table{width:100%;border-collapse:collapse;border:1px solid #9d7a3f;background:#fffdf4}
+  th{
+    background:linear-gradient(180deg,#f0dcae,#e0c890);color:var(--ink);font-size:10.5px;
+    font-weight:700;padding:3px 2px;border:1px solid #9d7a3f;text-shadow:0 1px 0 #fff6e0
+  }
+  td{
+    border:1px solid #9d7a3f;padding:2px 4px;text-align:center;font-size:12.5px;
+    font-variant-numeric:tabular-nums
+  }
+  tbody tr:nth-child(even){background:var(--mint)}
+  td.f{font-weight:700;padding:0}
+  td.f input{
+    width:100%;height:20px;border:0;background:transparent;padding:0;
+    text-align:center;font:700 12.5px "Trebuchet MS",sans-serif;color:var(--ink);
+    font-variant-numeric:tabular-nums;cursor:text
+  }
+  td.f input:hover{background:#fff4d3;box-shadow:inset 0 0 0 1px #d8b06a}
+  td.f input:focus{outline:0;background:#fffdf4;box-shadow:inset 0 0 0 2px #ffc25c}
+  td.man{background:#ffcf5e33}
+  td.man input{color:#8a3f08;text-decoration:underline;text-decoration-color:#d8a23c}
+  td.x{color:#b0512f}
+  tr.hit td{background:#ffcf5e;font-weight:700;box-shadow:inset 0 0 0 1px #a3480d}
+
+  .hint{
+    margin-top:10px;font-size:11.5px;color:#f0dcb4;text-align:center;
+    text-shadow:0 1px 0 #00000055
+  }
+  .hint kbd{
+    background:linear-gradient(180deg,#fffdf4,#ecdcb6);border:1px solid var(--gold3);
+    border-bottom-width:2px;border-radius:4px;padding:1px 5px;color:var(--ink);
+    font:700 11px/1.4 "Trebuchet MS",sans-serif;text-shadow:none
+  }
+  /* ---------- diálogo (no lugar do confirm do navegador) ---------- */
+  .mask{
+    position:fixed;inset:0;background:#1a2a1ccc;display:none;place-items:center;
+    z-index:80;padding:18px
+  }
+  .mask.on{display:grid}
+  .dlg{max-width:400px;width:100%;max-height:92vh;display:flex;flex-direction:column}
+  .dlg .plate{display:flex;flex-direction:column;overflow:hidden;max-height:calc(92vh - 12px)}
+  .dlg .mbody{overflow:auto;min-height:0}
+  .dlg h3{
+    margin:0;padding:9px 12px;font-size:14px;color:#fff4d8;text-shadow:0 1px 0 #5b3210;
+    background:linear-gradient(180deg,#c98a3a,#9c5c1d);border-bottom:2px solid var(--gold3);
+    border-radius:5px 5px 0 0
+  }
+  .dlg .mbody{padding:13px 14px}
+  .dlg .aviso{
+    margin:0;font-size:12.5px;color:var(--ink2);line-height:1.55;
+    border-left:3px solid var(--red1);background:#e2663f14;border-radius:0 6px 6px 0;padding:8px 11px
+  }
+  .dlg .aviso b{color:var(--red2)}
+  .dlg .mfoot{padding:10px 12px;border-top:1px dashed #c8ab74;display:flex;gap:8px;justify-content:flex-end}
+  .dlg .mfoot button.danger{
+    background:linear-gradient(180deg,#ef7d55,#cc4a26 55%,#a8331b);border-color:#7d2413;
+    box-shadow:inset 0 1px 0 #ffc9b6, 0 2px 0 #7d2413, 0 3px 6px #00000030
+  }
+
+  /* ---------- telas estreitas ---------- */
+  @media(max-width:860px){
+    .board{grid-template-columns:1fr}
+    .grid.d{grid-template-columns:repeat(5,1fr)}
+    .wrap{padding:12px 10px 34px}
+  }
+  @media(max-width:560px){
+    /* o texto de ajuda desce para a linha de baixo em vez de espremer o número */
+    .valrow{flex-wrap:wrap}
+    .valrow>div:last-child{flex:1 1 100%;order:3}
+    .bigval{flex:1 1 auto;min-width:0}
+    .step{flex:0 0 auto;padding:6px 18px}
+    .mm{gap:2px}
+    .mm button{padding:4px 0 3px}
+    .mm button b{font-size:13px}
+    .mm button i{font-size:8.5px}
+    .mmhead button{margin-left:0}
+    .tabs button{flex:1 1 auto}
+    #bTP{margin-left:0 !important}
+    .out{gap:18px}
+    /* atalhos de teclado não servem para quem está no celular */
+    .hint{display:none}
+    .mask{padding:10px}
+    .dlg .mfoot button{flex:1 1 auto}
+  }
+  @media(max-width:420px){
+    .wrap{padding:10px 8px 30px}
+    .nav a{flex:1;text-align:center;padding:8px 8px;font-size:13px}
+    .grid.w{grid-template-columns:repeat(5,1fr)}
+    .grid.d{grid-template-columns:repeat(4,1fr)}
+    .bigval{font-size:32px;min-width:0}
+    .erro button{flex:1 1 auto}
+    .tables{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <nav class="nav">
+    <a href="index.html" class="home">Menu</a>
+    <a href="calculadora.html" class="on">Calculadora de tiro</a>
+    <a href="referencias.html">Referências</a>
+    <a href="lab.html">Lab</a>
+  </nav>
+
+  <div class="frame" style="margin-bottom:12px"><div class="plate pad">
+    <div class="mmhead">
+      <span class="lbl" style="margin:0">Régua do jogo</span>
+      <span class="dica" id="mmDica"></span>
+      <button class="ghost" id="mmReset">mudei de lugar</button>
+    </div>
+    <div class="mm" id="mmGrid"></div>
+  </div></div>
+
+  <div class="board">
+    <!-- distância -->
+    <div class="frame"><div class="plate pad">
+      <div class="lbl">Distância no minimapa</div>
+      <div class="valrow">
+        <div class="bigval"><span id="dVal">10</span></div>
+        <button class="ghost step" data-d="-0.5">−</button>
+        <button class="ghost step" data-d="+0.5">+</button>
+        <div style="font-size:11.5px;color:var(--ink3);line-height:1.3">
+          clique a distância<br>ou use <b>−</b> / <b>+</b> (0,5)
+        </div>
+      </div>
+      <div class="grid d" id="dGrid"></div>
+    </div></div>
+
+    <!-- vento -->
+    <div class="frame"><div class="plate pad">
+      <div class="lbl">Vento</div>
+      <div class="dirrow">
+        <button class="ghost" id="bContra">◀ Contra</button>
+        <button class="ghost" id="bFavor">A favor ▶</button>
+      </div>
+      <div class="valrow">
+        <div class="bigval"><span id="wVal">0</span></div>
+        <button class="ghost step" data-w="-0.1">−</button>
+        <button class="ghost step" data-w="+0.1">+</button>
+        <div style="font-size:11.5px;color:var(--ink3);line-height:1.3" id="wTxt">sem vento</div>
+      </div>
+      <div class="grid w" id="wGrid"></div>
+    </div></div>
+  </div>
+
+  <!-- resultado -->
+  <div class="res frame"><div class="plate pad">
+    <div class="tabs" id="tabs"></div>
+    <div class="out">
+      <div class="big a"><span>Ângulo</span><strong id="oAng">—</strong></div>
+      <div class="big f" id="oFrcBox"><span>Força</span><strong id="oFrc">—</strong></div>
+    </div>
+    <div class="alt" id="alt"></div>
+    <div class="erro" id="erro"></div>
+  </div></div>
+
+  <!-- tabelas -->
+  <div class="refs">
+    <div class="refhead">
+      <h2>Tabelas de referência</h2>
+      <p id="refNote"></p>
+    </div>
+    <div class="tables" id="tables"></div>
+  </div>
+
+  <div class="hint">
+    <kbd>0-9</kbd> digita a distância · <kbd>↑</kbd><kbd>↓</kbd> distância ±0,5 ·
+    <kbd>←</kbd><kbd>→</kbd> vento ±0,5 · <kbd>espaço</kbd> inverte o vento ·
+    <kbd>Tab</kbd> troca o ângulo · <kbd>Esc</kbd> zera só o vento
+  </div>
+</div>
+
+<div class="mask" id="dmask">
+  <div class="dlg"><div class="frame"><div class="plate">
+    <h3 id="dTitle">Confirmar</h3>
+    <div class="mbody"><p class="aviso" id="dDesc"></p></div>
+    <div class="mfoot">
+      <button type="button" class="ghost" id="dCancel">Cancelar</button>
+      <button type="button" class="danger" id="dOk">Apagar</button>
+    </div>
+  </div></div></div>
+</div>
+
+<script>
+"use strict";
+/* ===========================================================================
+   MODELO BALÍSTICO — DDTank Classic
+   Bola com gravidade + arrasto linear (-kv) + vento como aceleração
+   horizontal constante. "Força" do jogo = velocidade de lançamento.
+
+   Constantes: ajuste por mínimos quadrados sobre as 80 células das tabelas
+   (ângulos 20/30/50/65) MAIS a regra do full angle (90-d com força 95).
+   Erro nas tabelas: RMSE 1,08 de força, 75/80 células dentro de ±2.
+
+   CONFIRMADO NO CÓDIGO DO SERVIDOR (DDTank 3.0, C#). O jogo integra
+     x2 = (f - af*x1)/m ;  x1 += x2*dt ;  x0 += x1*dt      com dt = 0,04 s
+   (Phy/Maths/EulerVector.cs), que é arrasto linear -kv literal, e lança com
+   vx = força*cos(ang), vy = força*sen(ang) — a força É a velocidade. O ponto
+   de saída é um deslocamento fixo, não gira com o ângulo. Refiz o ajuste com
+   esse integrador: RMSE 1,070 contra 1,08 daqui, ou seja o passo discreto não
+   muda nada — por isso as constantes acima seguem valendo.
+
+   ATENÇÃO: no servidor a gravidade e o arrasto são POR MAPA (MapInfo.Weight /
+   DragIndex) e a massa/peso/arrasto são POR MUNIÇÃO. Estas constantes valem
+   para o mapa e a arma em que as tabelas foram medidas.
+
+   Validação cruzada com o projeto Stardust_DDTank (engenharia reversa do
+   jogo, constantes k=0,32 g=23,45 força=v*2,83 vento=0,82*w). Convertendo
+   para as mesmas unidades: vento 2,9% de diferença, força->velocidade 3,5%,
+   arrasto 11,4%. Três origens independentes, mesma física.
+
+   Detalhes completos em modelo-de-tiro.txt — documento local, fora do
+   repositório (ver .gitignore); o resumo da lógica está no README.
+   =========================================================================== */
+const G=1.0, B=0.005560, S=175.4508, H0=58.010, WIND_A=0.033947, FMAX=100;
+
+function tempoVoo(vy0){
+  const k=(vy0+G/B)/B;
+  const alt=t=>k*(1-Math.exp(-B*t))-(G/B)*t+H0;
+  const apice=vy0>0?Math.log(1+B*vy0/G)/B:0;
+  let hi=apice*2+10;
+  for(let i=0;i<80&&alt(hi)>0;i++) hi*=2;
+  let lo=apice+1e-9;
+  for(let i=0;i<100;i++){ const m=(lo+hi)/2; if(alt(m)>0) lo=m; else hi=m; }
+  return (lo+hi)/2;
+}
+// vento > 0 = a favor, < 0 = contra
+function alcance(forca,ang,vento){
+  if(forca<=0) return 0;
+  const th=ang*Math.PI/180, vx=forca*Math.cos(th), vy=forca*Math.sin(th), a=WIND_A*vento;
+  const t=tempoVoo(vy);
+  return (((vx-a/B)/B)*(1-Math.exp(-B*t))+(a/B)*t)/S;
+}
+function forcaNecessaria(d,ang,vento){
+  if(alcance(FMAX,ang,vento)<d) return null;
+  let lo=0,hi=FMAX;
+  for(let i=0;i<70;i++){ const m=(lo+hi)/2; if(alcance(m,ang,vento)<d) lo=m; else hi=m; }
+  return (lo+hi)/2;
+}
+// ângulo de alcance máximo para uma força (fica perto de 41°)
+function anguloOtimo(forca,vento){
+  let best=41,bd=-1;
+  for(let a=5;a<=89;a++){ const r=alcance(forca,a,vento); if(r>bd){bd=r;best=a;} }
+  let lo=best-1,hi=best+1;
+  for(let i=0;i<40;i++){
+    const m1=lo+(hi-lo)/3, m2=hi-(hi-lo)/3;
+    if(alcance(forca,m1,vento)<alcance(forca,m2,vento)) lo=m1; else hi=m2;
+  }
+  return (lo+hi)/2;
+}
+// ângulo que acerta a distância com uma força fixa. alto=true -> arco alto
+function anguloNecessario(d,forca,vento,alto){
+  const opt=anguloOtimo(forca,vento);
+  if(alcance(forca,opt,vento)<d) return null;
+  let lo,hi;
+  if(alto){ lo=opt; hi=89; if(alcance(forca,hi,vento)>d) return null; }
+  else{ lo=5; hi=opt; if(alcance(forca,lo,vento)>d) return null; }
+  for(let i=0;i<60;i++){
+    const m=(lo+hi)/2;
+    const dentro=alcance(forca,m,vento)>d;
+    if(alto){ if(dentro) lo=m; else hi=m; } else { if(dentro) hi=m; else lo=m; }
+  }
+  return (lo+hi)/2;
+}
+// tiro full: ângulo alto cuja força necessária chega mais perto de 95
+function fullAngle(d,vento){
+  let melhor=null;
+  for(let a=89;a>=46;a--){
+    const f=forcaNecessaria(d,a,vento);
+    if(f===null) continue;
+    const e=Math.abs(f-95);
+    if(!melhor||e<melhor.e) melhor={ang:a,forca:f,e};
+  }
+  return melhor;
+}
+
+/* Tiro de três pontas: o servidor dispara a 2ª bola com força x0,9 e ângulo
+   -5°, e a 3ª com força x1,1 e ângulo +5° (Game.Logic/Phy/Object/Living.cs).
+   Devolve onde cada uma cai, para você ver a abertura antes de atirar. */
+function tresPontas(forca,ang,vento){
+  return [[0.9,-5],[1,0],[1.1,5]].map(([rf,ra])=>alcance(forca*rf,ang+ra,vento));
+}
+
+/* ---------------------------------------------------------------------------
+   VALORES MEDIDOS: se você corrigiu a célula da tabela, esse número passa a ser
+   a verdade para aquela distância. O vento continua vindo do modelo: aplico a
+   diferença que o modelo prevê entre "com vento" e "sem vento" por cima do seu
+   valor, em vez de jogar o seu número fora.
+   --------------------------------------------------------------------------- */
+function forcaFinal(d,ang,w){
+  const base=forcaNecessaria(d,ang,w);
+  const ov=st.ov[ang+'|'+d];
+  if(ov===undefined||!Number.isInteger(d)||base===null) return {f:base,manual:false,ov};
+  const m0=forcaNecessaria(d,ang,0);
+  if(m0===null) return {f:base,manual:false,ov};
+  return {f:ov+(base-m0), manual:true, ov};
+}
+
+/* =========================== estado + interface =========================== */
+const $=id=>document.getElementById(id);
+const PRESETS=[20,30,50,65];
+let st={d:10, w:0, favor:false, ang:65, ov:{},    // ov = forças medidas por você (sem vento)
+        eu:null, alvo:null,                      // posições na faixa do minimapa
+        tp:false, compacto:false};               // três pontas ligado? tabelas escondidas?
+try{ const s=JSON.parse(localStorage.getItem('ddtank_calc')); if(s) st={...st,...s}; }catch(e){}
+if(!st.ov||typeof st.ov!=='object') st.ov={};
+const salvar=()=>{ try{ localStorage.setItem('ddtank_calc',JSON.stringify(st)); }catch(e){} };
+const vento=()=> st.favor? st.w : -st.w;
+
+/* Confirmação na cara do jogo, no lugar do confirm() cinza do navegador (que
+   ainda por cima trava a página enquanto está aberto). Devolve uma Promise. */
+const dlg={aberto:false,fim:null,antes:null};
+function pedirOk(o){
+  dlg.aberto=true; dlg.antes=document.activeElement;
+  $('dTitle').textContent=o.titulo||'Confirmar';
+  $('dDesc').innerHTML=o.desc||'';
+  $('dOk').textContent=o.ok||'OK';
+  $('dCancel').textContent=o.cancelar||'Cancelar';
+  $('dmask').classList.add('on');
+  setTimeout(()=>$('dOk').focus(),40);
+  return new Promise(res=>{ dlg.fim=res; });
+}
+function fecharDlg(v){
+  if(!dlg.aberto)return;
+  dlg.aberto=false; $('dmask').classList.remove('on');
+  const fim=dlg.fim; dlg.fim=null;
+  try{ if(dlg.antes&&dlg.antes.focus)dlg.antes.focus(); }catch(e){}
+  if(fim)fim(v);
+}
+$('dOk').addEventListener('click',()=>fecharDlg(true));
+$('dCancel').addEventListener('click',()=>fecharDlg(false));
+$('dmask').addEventListener('click',e=>{ if(e.target===$('dmask'))fecharDlg(false); });
+const fmt=n=> Number.isInteger(n)? String(n) : n.toFixed(1).replace('.',',');
+
+/* --- régua: a mesma que o jogo desenha embaixo da tela, de 0 a 10 ---
+   Você lê a sua marca e a do inimigo na régua do jogo e clica nas duas aqui;
+   a distância é a diferença. 1º clique marca VOCÊ, 2º marca o ALVO. Depois
+   disso cada clique só move o alvo — que é o que muda dentro de um turno. */
+const MM=11;
+$('mmGrid').innerHTML=Array.from({length:MM},(_,i)=>
+  `<button class="ghost" data-mm="${i}"><b>${i}</b><i></i></button>`).join('');
+function renderMM(){
+  const cels=document.querySelectorAll('[data-mm]');
+  cels.forEach(b=>{
+    const i=+b.dataset.mm;
+    b.classList.toggle('eu',st.eu===i);
+    b.classList.toggle('alvo',st.alvo===i&&st.eu!==i);
+    b.querySelector('i').textContent =
+        st.eu===i ? 'você'
+      : (st.eu===null ? '' : (st.alvo===i?'alvo':'+'+Math.abs(i-st.eu)));
+  });
+  $('mmDica').innerHTML = st.eu===null
+    ? 'na régua embaixo da tela do jogo: clique no número onde <b>você</b> está'
+    : (st.alvo===null ? 'agora clique no número onde está o <b>inimigo</b>'
+                      : `distância <b>${Math.abs(st.alvo-st.eu)}</b> — clique noutro número para trocar de alvo`);
+}
+
+/* --- botões de distância (1 a 20) --- */
+$('dGrid').innerHTML=Array.from({length:20},(_,i)=>
+  `<button class="ghost" data-dist="${i+1}">${i+1}</button>`).join('');
+/* --- botões de vento (0 a 6, de 0,5 em 0,5) --- */
+$('wGrid').innerHTML=Array.from({length:14},(_,i)=>{
+  const v=i*0.5;
+  return `<button class="ghost" data-wind="${v}">${fmt(v)}</button>`;
+}).join('');
+/* --- abas de ângulo --- */
+$('tabs').innerHTML=PRESETS.map(a=>`<button class="ghost" data-ang="${a}">${a}°</button>`).join('')
+  +`<button class="ghost" data-ang="full">FULL (força 95)</button>`
+  +`<button class="ghost" data-angstep="-1">−1°</button>`
+  +`<button class="ghost" data-angstep="1">+1°</button>`
+  +`<button class="ghost" id="bTP" style="margin-left:auto"
+      title="Liga a previsão das três bolas — use quando estiver com arma de três pontas">3 pontas</button>`
+  +`<button class="ghost" id="bCompacto"
+      title="Esconde as tabelas para a janela caber ao lado do jogo">tabelas</button>`
+  +`<button class="ghost" id="bZerar"
+      title="Volta para distância 10, vento 0 e ângulo 65. Não apaga os valores que você mediu nas tabelas.">zerar</button>`;
+
+function render(){
+  const w=vento(), d=st.d;
+  $('dVal').textContent=fmt(d);
+  $('wVal').textContent=fmt(st.w);
+  $('wTxt').innerHTML = st.w===0 ? 'sem vento'
+    : (st.favor? 'empurra o tiro<br><b>a favor ▶</b>' : 'segura o tiro<br><b>◀ contra</b>');
+  $('bContra').classList.toggle('on',!st.favor && st.w>0);
+  $('bFavor').classList.toggle('on',st.favor && st.w>0);
+
+  document.querySelectorAll('[data-dist]').forEach(b=>
+    b.classList.toggle('on',+b.dataset.dist===Math.round(d)&&Number.isInteger(d)));
+  document.querySelectorAll('[data-wind]').forEach(b=>
+    b.classList.toggle('on',Math.abs(+b.dataset.wind-st.w)<1e-9));
+  document.querySelectorAll('[data-ang]').forEach(b=>
+    b.classList.toggle('on',String(st.ang)===b.dataset.ang));
+
+  const box=$('oFrcBox');
+  box.classList.remove('bad');
+
+  if(st.ang==='full'){
+    const r=fullAngle(d,w);
+    if(!r){ semTiro('Nem no arco alto dá para chegar a '+fmt(d)+' com esse vento.'); }
+    else{
+      $('oAng').textContent=r.ang;
+      $('oFrc').textContent=Math.round(r.forca);
+      const regra=Math.round(90-d+(st.favor?2*st.w:-2*st.w));
+      $('alt').innerHTML=
+        `Arco alto: mire em <b>${r.ang}°</b> com força <b>${Math.round(r.forca)}</b>.`+
+        linhaTresPontas(r.forca,r.ang,w,d)+
+        `<span class="rule">regra da comunidade: 90 − ${fmt(d)} ${st.favor?'+':'−'} 2×${fmt(st.w)} = <b>${regra}°</b> com força 95`+
+        (regra===r.ang?' (bate certo)':` — o cálculo exato dá ${r.ang}°`)+`</span>`;
+    }
+  }else{
+    const ang=st.ang;
+    const r=forcaFinal(d,ang,w), f=r.f;
+    $('oAng').textContent=ang;
+    if(f===null){
+      semTiro(`Força 100 no ângulo ${ang}° não chega a ${fmt(d)}.`);
+    }else{
+      $('oFrc').textContent=Math.round(f);
+      const f0=r.manual? r.ov : forcaNecessaria(d,ang,0);
+      let html;
+      if(st.w===0||f0===null){
+        html=`Sem vento: mire em <b>${ang}°</b> com força <b>${Math.round(f)}</b>.`;
+      }else{
+        const dif=Math.round(f)-Math.round(f0);
+        const alto=ang>45;
+        const a2=anguloNecessario(d,f0,w,alto);
+        const regra=ang+(st.favor?(alto?2*st.w:-2*st.w):(alto?-2*st.w:2*st.w));
+        html=`O vento cobra <b>${dif>0?'+':''}${dif}</b> de força (sem vento seriam ${Math.round(f0)}).`;
+        if(a2!==null){
+          html+=`<span class="rule">ou mantenha a força da tabela (<b>${Math.round(f0)}</b>) e mire em `+
+                `<b>${Math.round(a2)}°</b> · regra da comunidade: ${Math.round(regra)}°</span>`;
+        }
+        if(Math.abs(dif)<=1) html+=`<span class="rule">nesse ângulo o vento quase não pesa — pode ignorar</span>`;
+      }
+      html+=linhaTresPontas(f,ang,w,d);
+      if(r.manual) html+=`<span class="rule">partindo do seu valor medido (<b>${r.ov}</b> sem vento) em vez do calculado (${Math.round(forcaNecessaria(d,ang,0))})</span>`;
+      $('alt').innerHTML=html;
+    }
+  }
+  renderMM();
+  $('bTP').classList.toggle('on',st.tp);
+  $('bCompacto').classList.toggle('on',!st.compacto);
+  document.querySelector('.refs').hidden=st.compacto;
+  renderErro(w);
+  if(st.compacto){ salvar(); return; }
+  renderTabelas(w);
+  const n=Object.keys(st.ov).length;
+  $('refNote').innerHTML =
+    (st.w===0 ? 'sem vento' : `recalculadas com vento ${fmt(st.w)} ${st.favor?'a favor':'contra'}`)
+    + ' · clique numa célula para corrigir com o valor real'
+    + ' · <span title="No servidor a gravidade e o arrasto são por mapa, e massa/peso/arrasto são por munição — cada mapa e cada arma têm a sua tabela.">valem para o mapa e a arma em que você mediu</span>'
+    + (n? ` · <b>${n}</b> valor${n>1?'es':''} seu${n>1?'s':''} <button id="bLimpar" style="padding:2px 8px;font-size:11px;margin-left:4px">limpar</button>`:'');
+  salvar();
+}
+function linhaTresPontas(forca,ang,w,d){
+  if(!st.tp) return '';
+  const p=tresPontas(forca,ang,w);
+  const n=x=>x.toFixed(1).replace('.',',');
+  const ab=Math.max(...p)-Math.min(...p);     // abertura real: a maior menos a menor
+  const juntas = ab<=1.2;
+  return `<span class="rule">três pontas: cai em <b>${n(p[0])}</b> · <b>${n(p[1])}</b> · <b>${n(p[2])}</b>`+
+         (juntas ? ` — as três quase no alvo (abertura ${n(ab)})`
+                 : ` — espalha ${n(ab)} de largura`)+`</span>`;
+}
+/* Corrige em um clique depois de errar: grava força ±1 como valor medido
+   naquela célula, para a correção valer nas próximas vezes (e com vento). */
+function renderErro(w){
+  const box=$('erro');
+  const d=st.d, ang=st.ang;
+  if(ang==='full'||!Number.isInteger(d)){
+    box.innerHTML = ang==='full'
+      ? '<span class="tit">no full a correção é no ângulo, não na força</span>' : '';
+    return;
+  }
+  const r=forcaFinal(d,ang,w);
+  if(r.f===null){ box.innerHTML=''; return; }
+  box.innerHTML=
+    '<span class="tit">errou?</span>'+
+    '<button class="ghost" data-fix="1" title="Faltou alcance: guarda +1 de força para esta distância">caiu curto  +1</button>'+
+    '<button class="ghost" data-fix="-1" title="Passou do alvo: guarda −1 de força para esta distância">passou  −1</button>';
+}
+function corrigir(delta){
+  const w=vento(), d=st.d, ang=st.ang;
+  if(ang==='full'||!Number.isInteger(d)) return;
+  const r=forcaFinal(d,ang,w);
+  if(r.f===null) return;
+  const alvo=Math.round(r.f)+delta;               // o que você deveria ter usado, com o vento atual
+  const base=forcaNecessaria(d,ang,w), m0=forcaNecessaria(d,ang,0);
+  if(base===null||m0===null) return;
+  const semVento=Math.round(alvo-(base-m0));      // guarda sempre em "sem vento"
+  if(semVento===Math.round(m0)) delete st.ov[ang+'|'+d];
+  else st.ov[ang+'|'+d]=semVento;
+  render();
+}
+function semTiro(msg){
+  $('oFrc').textContent='não alcança';
+  $('oFrcBox').classList.add('bad');
+  $('alt').innerHTML=msg+' Use um ângulo mais perto de 41° (o de maior alcance).';
+}
+function renderTabelas(w){
+  const hit=Math.round(st.d);
+  $('tables').innerHTML=PRESETS.map(a=>{
+    let rows='';
+    const cel=(d)=>{
+      const r=forcaFinal(d,a,w);
+      if(r.f===null) return '<td class="x">—</td>';
+      return `<td class="f${r.manual?' man':''}">`+
+             `<input inputmode="numeric" data-ov="${a}|${d}" value="${Math.round(r.f)}" `+
+             `title="${r.manual?'seu valor medido: '+r.ov+' (sem vento). Apague para voltar ao calculado.':'calculado — digite o valor real se souber'}"></td>`;
+    };
+    for(let i=1;i<=10;i++){
+      const on=(hit===i||hit===i+10)?' class="hit"':'';
+      rows+=`<tr${on}><td>${i}</td>${cel(i)}<td>${i+10}</td>${cel(i+10)}</tr>`;
+    }
+    return `<div class="frame"><div class="plate tbox">
+      <h3>Âng. ${a}</h3>
+      <table>
+        <thead><tr><th>Distância</th><th>Força</th><th>Distância</th><th>Força</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div></div>`;
+  }).join('');
+}
+
+/* ------------------------------ eventos ------------------------------ */
+const setD=v=>{ st.d=Math.min(20,Math.max(0.5,Math.round(v*2)/2)); render(); };
+const setW=v=>{ st.w=Math.min(12,Math.max(0,Math.round(v*10)/10)); render(); };
+// vento com sinal: negativo = contra, positivo = a favor
+const setSigned=v=>{
+  v=Math.max(-12,Math.min(12,Math.round(v*10)/10));
+  st.favor = v>0; st.w=Math.abs(v); render();
+};
+document.addEventListener('click',e=>{
+  if(e.target.closest('#dmask'))return;
+  const b=e.target.closest('button'); if(!b)return;
+  if(b.dataset.dist)      setD(+b.dataset.dist);
+  else if(b.dataset.d)    setD(st.d+parseFloat(b.dataset.d));
+  else if(b.dataset.wind) setW(+b.dataset.wind);
+  else if(b.dataset.w)    setW(st.w+parseFloat(b.dataset.w));
+  else if(b.dataset.ang)  { st.ang = b.dataset.ang==='full'?'full':+b.dataset.ang; render(); }
+  else if(b.dataset.angstep){
+    const cur = st.ang==='full'? 65 : st.ang;
+    st.ang=Math.min(89,Math.max(5,cur+ +b.dataset.angstep)); render();
+  }
+  else if(b.id==='bContra'){ st.favor=false; render(); }
+  else if(b.id==='bFavor'){ st.favor=true; render(); }
+  else if(b.dataset.mm!==undefined){
+    const i=+b.dataset.mm;
+    if(st.eu===null) st.eu=i;
+    else if(i!==st.eu){ st.alvo=i; setD(Math.abs(i-st.eu)); return; }
+    render();
+  }
+  else if(b.id==='mmReset'){ st.eu=null; st.alvo=null; render(); }
+  else if(b.dataset.fix){ corrigir(+b.dataset.fix); }
+  else if(b.id==='bTP'){ st.tp=!st.tp; render(); }
+  else if(b.id==='bCompacto'){ st.compacto=!st.compacto; render(); }
+  else if(b.id==='bZerar'){
+    st.d=10; st.w=0; st.favor=false; st.ang=65;   // ov fica: é dado que você mediu
+    render();
+  }
+  else if(b.id==='bLimpar'){
+    const n=Object.keys(st.ov).length;
+    pedirOk({
+      titulo:'Apagar os valores medidos?',
+      desc:`Você corrigiu <b>${n}</b> célula${n>1?'s':''} à mão. Apagar devolve todas ao valor calculado pelo modelo.`,
+      ok:'Apagar'
+    }).then(ok=>{ if(ok){ st.ov={}; render(); } });
+  }
+});
+
+/* --- edição das células da tabela --- */
+function gravarCelula(inp){
+  const [ang,d]=inp.dataset.ov.split('|').map(Number);
+  const txt=inp.value.trim();
+  const w=vento();
+  if(txt===''){ delete st.ov[ang+'|'+d]; render(); return; }
+  let v=parseInt(txt,10);
+  if(isNaN(v)||v<1||v>100){ render(); return; }
+  // o que você digitou vale para o vento que está na tela: converto para sem vento
+  const base=forcaNecessaria(d,ang,w), m0=forcaNecessaria(d,ang,0);
+  const semVento = (base===null||m0===null)? v : Math.round(v-(base-m0));
+  const calc=Math.round(m0===null?NaN:m0);
+  if(semVento===calc) delete st.ov[ang+'|'+d];      // igual ao calculado, não precisa guardar
+  else st.ov[ang+'|'+d]=semVento;
+  render();
+}
+document.addEventListener('change',e=>{
+  const inp=e.target.closest('input[data-ov]'); if(inp) gravarCelula(inp);
+});
+document.addEventListener('keydown',e=>{
+  const inp=e.target.closest&&e.target.closest('input[data-ov]');
+  if(inp&&(e.key==='Enter'||e.key==='Escape')){ e.stopPropagation(); inp.blur(); }
+},true);
+document.addEventListener('focusin',e=>{
+  const inp=e.target.closest&&e.target.closest('input[data-ov]'); if(inp) inp.select();
+});
+/* teclado: digitar a distância direto */
+let buf='', bufT=0;
+document.addEventListener('keydown',e=>{
+  if(dlg.aberto){
+    if(e.key==='Escape'){ fecharDlg(false); e.preventDefault(); }
+    else if(e.key==='Enter'){ fecharDlg(true); e.preventDefault(); }
+    return;
+  }
+  // digitando dentro de uma célula da tabela: os atalhos ficam de fora
+  if(/^(INPUT|TEXTAREA)$/.test(e.target.tagName)||e.target.isContentEditable) return;
+  if(/^[0-9]$/.test(e.key)){
+    const agora=Date.now();
+    buf = (agora-bufT<900? buf+e.key : e.key);
+    bufT=agora;
+    let v=parseInt(buf,10);
+    if(v>20){ buf=e.key; v=parseInt(buf,10); }
+    if(v>=1) setD(v);
+    e.preventDefault();
+  }
+  else if(e.key==='ArrowUp')   { setD(st.d+0.5); e.preventDefault(); }
+  else if(e.key==='ArrowDown') { setD(st.d-0.5); e.preventDefault(); }
+  else if(e.key==='ArrowLeft') { setSigned(vento()-0.5); e.preventDefault(); }
+  else if(e.key==='ArrowRight'){ setSigned(vento()+0.5); e.preventDefault(); }
+  else if(e.key===' ')         { st.favor=!st.favor; render(); e.preventDefault(); }
+  else if(e.key==='Tab'){
+    const lista=[...PRESETS,'full'];
+    const i=lista.findIndex(x=>String(x)===String(st.ang));
+    st.ang=lista[(i+(e.shiftKey?lista.length-1:1))%lista.length];
+    render(); e.preventDefault();
+  }
+  else if(e.key==='Escape'){ st.w=0; st.favor=false; render(); }
+});
+render();
+</script>
+</body>
+</html>
