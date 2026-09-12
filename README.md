@@ -1,12 +1,14 @@
 # Caderno de Tiro
 
+**→ [caderno-de-tiro.github.io](https://caderno-de-tiro.github.io/)**
+
 Três ferramentas para jogar DDTank Classic com número na mão em vez de chute:
 uma calculadora de tiro que resolve ângulo e força pela física do jogo, e duas
 cadernetas para guardar o que você já mediu em partida.
 
 Site estático puro — quatro arquivos HTML, sem build, sem servidor, sem
 dependência externa, sem uma única requisição de rede. Tudo o que você cadastra
-fica no `localStorage` do seu navegador.
+fica no `localStorage` do seu navegador, e nada sai de lá.
 
 ## As páginas
 
@@ -92,22 +94,6 @@ Duas consequências que a página respeita e as regras de comunidade não:
 O detalhamento completo (tabelas de origem, o ajuste e a comparação entre as
 fontes) fica em `modelo-de-tiro.txt`, um documento local que não é versionado.
 
-## Como rodar
-
-É HTML estático: abrir `index.html` no navegador já funciona. Para servir local
-com as três páginas conversando entre si:
-
-```sh
-python3 -m http.server 8000
-```
-
-e acessar `http://localhost:8000`.
-
-### Publicar no GitHub Pages
-
-Não há passo de build. Em **Settings → Pages**, aponte a origem para a branch e
-a pasta raiz (`/`) — o `index.html` já está no lugar certo.
-
 ## Seus dados
 
 O site é publicado **em branco** — ninguém herda os tiros de ninguém. Cada
@@ -142,13 +128,11 @@ em todo lugar. Qualquer arquivo que chega passa pelo mesmo saneamento — ids
 validados, números limitados — então um `.json` de terceiro não consegue
 injetar nada na página.
 
-Nada sai do seu navegador — não existe conta, back-end nem telemetria. As três
-páginas declaram uma `Content-Security-Policy` com `default-src 'none'` e
-`connect-src 'none'`: elas não carregam nem enviam nada para lugar nenhum, e o
-navegador impede que passem a fazer isso. Para
-levar os dados para outro aparelho (ou trocar com alguém), as Referências e o
-Lab baixam e carregam o banco em `.json`, com opção de **substituir** ou
-**juntar** com o que já está salvo.
+Não existe conta, back-end nem telemetria. As quatro páginas declaram uma
+`Content-Security-Policy` com `default-src 'none'` e `connect-src 'none'`: elas
+não carregam nem enviam nada para lugar nenhum, e o navegador impede que passem
+a fazer isso.
 
-Esses `.json` baixados, e os `.txt` de "copiar como texto", ficam fora do
-repositório pelo `.gitignore` — são seus dados, não parte do site.
+Como nada sincroniza sozinho, o backup é manual e é seu — baixe o `.json` sempre
+que cadastrar algo que não quer perder. Ele e os `.txt` de "copiar como texto"
+ficam fora do repositório pelo `.gitignore`: são seus dados, não parte do site.
