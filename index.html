@@ -148,6 +148,21 @@
   .atalho:focus-visible .bolha{animation:sobe 1.15s ease-in-out infinite;transform-origin:center}
   .atalho:hover .b2,.atalho:focus-visible .b2{animation-delay:.42s}
 
+  /* ---------- rodapé ---------- */
+  .rodape{
+    margin:16px 0 0;padding-top:13px;text-align:center;
+    border-top:1px solid #ffffff26;
+    font:12px/1 ui-monospace,"Cascadia Mono",Consolas,"DejaVu Sans Mono",monospace;
+    letter-spacing:.07em;color:#c3d9c6;text-shadow:0 1px 0 #1e3f2b;
+  }
+  .rodape a{
+    color:var(--gold1);text-decoration:none;
+    border-bottom:1px solid transparent;padding-bottom:2px;
+    transition:color .14s,border-color .14s;
+  }
+  .rodape a:hover,.rodape a:focus-visible{color:#fff6da;border-bottom-color:#ffe9a8a6}
+  .rodape .sep{margin:0 11px;opacity:.4}
+
   @media (prefers-reduced-motion:reduce){
     .atalho .frame,.atalho .plate,.atalho b::after{transition:none}
     .atalho svg *{animation:none !important}
@@ -282,6 +297,11 @@
     </div>
     <input type="file" id="file" accept=".json,application/json" hidden>
   </div></div>
+
+  <footer class="rodape">
+    <a href="https://www.linkedin.com/in/brennocm/" target="_blank" rel="noopener noreferrer">brennocm</a>
+    <span class="sep">|</span>© 20&#8734;
+  </footer>
 
 </div>
 

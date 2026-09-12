@@ -264,6 +264,21 @@
   #toast.on{opacity:1;transform:translate(-50%,0)}
 
   /* ---------- telas estreitas ---------- */
+  /* ---------- rodapé ---------- */
+  .rodape{
+    margin:16px 0 0;padding-top:13px;text-align:center;
+    border-top:1px solid #ffffff26;
+    font:12px/1 ui-monospace,"Cascadia Mono",Consolas,"DejaVu Sans Mono",monospace;
+    letter-spacing:.07em;color:#c3d9c6;text-shadow:0 1px 0 #1e3f2b;
+  }
+  .rodape a{
+    color:var(--gold1);text-decoration:none;
+    border-bottom:1px solid transparent;padding-bottom:2px;
+    transition:color .14s,border-color .14s;
+  }
+  .rodape a:hover,.rodape a:focus-visible{color:#fff6da;border-bottom-color:#ffe9a8a6}
+  .rodape .sep{margin:0 11px;opacity:.4}
+
   @media(hover:none){ .c-act .acts{opacity:1} }
 
   @media(max-width:620px){
@@ -361,6 +376,11 @@
     <div class="bkinfo" id="bkInfo"></div>
     <input type="file" id="fileJson" accept=".json,application/json" hidden>
   </div></div>
+
+  <footer class="rodape">
+    <a href="https://www.linkedin.com/in/brennocm/" target="_blank" rel="noopener noreferrer">brennocm</a>
+    <span class="sep">|</span>© 20&#8734;
+  </footer>
 </div>
 
 <!-- modal de arquivo / texto -->
